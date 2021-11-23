@@ -466,7 +466,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: alienlegacy-build-artifact
-          path: alienleagcy-build-artifact.tar
+          path: alienlegacy-build-artifact.tar
           retention-days: 1
 
   arccore-test:
