@@ -465,7 +465,7 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v2
         with:
-          name: alienlecgay-build-artifact
+          name: alienlegacy-build-artifact
           path: alienleagcy-build-artifact.tar
           retention-days: 1
 
