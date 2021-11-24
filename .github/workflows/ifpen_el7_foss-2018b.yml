@@ -316,7 +316,7 @@ jobs:
           retention-days: 1
       - name: Tar install artifact
         shell: bash
-        run: tar cf arcane-install-artifact.tar ${{ env.ARCANE_BUILD_DIR }}
+        run: tar cf arcane-install-artifact.tar ${{ env.ARCANE_INSTALL_DIR }}
       - name: Upload install artifact
         uses: actions/upload-artifact@v2
         with:
