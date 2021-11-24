@@ -627,13 +627,6 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: ${{ env.ALIENLEGACY_SOURCE_DIR }}
-      - name: Download alien build artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: alien-build-artifact
-      - name: Untar alien build artifact
-        shell: bash
-        run: tar xf alien-build-artifact.tar -C /
       - name: Download alienlegacy build artifact
         uses: actions/download-artifact@v2
         with:
@@ -641,6 +634,13 @@ jobs:
       - name: Untar alienlegacy build artifact
         shell: bash
         run: tar xf alienlegacy-build-artifact.tar -C /
+      - name: Download alien install artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: alien-install-artifact
+      - name: Untar alien install artifact
+        shell: bash
+        run: tar xf alien-install-artifact.tar -C /
       - name: Download arcane install artifact
         uses: actions/download-artifact@v2
         with:
