@@ -314,6 +314,15 @@ jobs:
           name: arcane-build-artifact
           path: arcane-build-artifact.tar
           retention-days: 1
+      - name: Tar install artifact
+        shell: bash
+        run: tar cf arcane-install-artifact.tar ${{ env.ARCANE_BUILD_DIR }}
+      - name: Upload install artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: arcane-install-artifact
+          path: arcane-install-artifact.tar
+          retention-days: 1
 
   alien-install:
     name: alien-install
@@ -405,6 +414,13 @@ jobs:
         with:
           path: ${{ env.ALIENLEGACY_SOURCE_DIR }}
           submodules: true
+      - name: Download arcane install artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: arcane-install-artifact
+      - name: Untar arcane install artifact
+        shell: bash
+        run: tar xf arcane-install-artifact.tar -C /
       - name: Download arccon install artifact
         uses: actions/download-artifact@v2
         with:
@@ -625,13 +641,6 @@ jobs:
       - name: Untar alienlegacy build artifact
         shell: bash
         run: tar xf alienlegacy-build-artifact.tar -C /
-      - name: Download arccore install artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: arccore-install-artifact
-      - name: Untar arccore install artifact
-        shell: bash
-        run: tar xf arccore-install-artifact.tar -C /
       - name: Download arcane install artifact
         uses: actions/download-artifact@v2
         with:
@@ -639,6 +648,13 @@ jobs:
       - name: Untar arcane install artifact
         shell: bash
         run: tar xf arcane-install-artifact.tar -C /
+      - name: Download arccore install artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: arccore-install-artifact
+      - name: Untar arccore install artifact
+        shell: bash
+        run: tar xf arccore-install-artifact.tar -C /
       - name: Test
         shell: bash
         run: ctest --test-dir ${{ env.ALIENLEGACY_BUILD_DIR }} ${{ env.CT_OPTS }}
