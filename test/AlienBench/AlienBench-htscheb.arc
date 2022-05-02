@@ -18,10 +18,10 @@
   <mesh>
     <meshgenerator>
       <cartesian>
-        <origine></origine>
-        <nds>1 1 1</nds>
-        <lx nx="10">1.</lx>
-        <ly ny="10">1.</ly>
+        <origine>0. 0. 0.</origine>
+        <nsd>1 1 1</nsd>
+        <lx nx="100">1.</lx>
+        <ly ny="100">1.</ly>
         <lz nz="10">1.</lz>
       </cartesian>
     </meshgenerator>
@@ -43,10 +43,10 @@
         <max-iteration-num>1000</max-iteration-num>
         <stop-criteria-value>1e-8</stop-criteria-value>
         <preconditioner>Chebyshev</preconditioner>
-        <poly-degree>3</poly-degree>
-        <poly-factor>0.</poly-factor>
+        <poly-degree>1</poly-degree>
+        <poly-factor>30.</poly-factor>
         <poly-factor-max-iter>10</poly-factor-max-iter>
-        <output>1</output>
+        <output>3</output>
         <nb-part>1</nb-part>
         <nb-subpart>1</nb-subpart>
       </linear-solver>

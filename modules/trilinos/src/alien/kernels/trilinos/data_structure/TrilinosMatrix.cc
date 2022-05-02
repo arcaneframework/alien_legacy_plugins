@@ -159,7 +159,9 @@ TrilinosMatrix<ValueT, TagT>::dump(std::string const& filename) const
       filename, *m_internal->m_internal);
 }
 
+#ifdef KOKKOS_ENABLE_SERIAL
 template class TrilinosMatrix<double, BackEnd::tag::tpetraserial>;
+#endif
 #ifdef KOKKOS_ENABLE_OPENMP
 template class TrilinosMatrix<double, BackEnd::tag::tpetraomp>;
 #endif
