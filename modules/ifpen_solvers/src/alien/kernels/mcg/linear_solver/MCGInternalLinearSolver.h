@@ -10,6 +10,12 @@
 #include <memory>
 #include <chrono>
 
+#include <MCGSolver/SolverOptionsEnum.h>
+#include <Common/Utils/ParallelEnv.h>
+#include <MCGSolver/ILinearSystem.h>
+#include <MCGSolver/ILinearSolver.h>
+
+
 #include <alien/utils/Precomp.h>
 #include <alien/core/backend/IInternalLinearSolverT.h>
 #include <alien/expression/solver/SolverStater.h>
@@ -220,8 +226,6 @@ class ALIEN_IFPEN_SOLVERS_EXPORT MCGInternalLinearSolver : public ILinearSolver,
 
   // From internal MCGSolver timing
   Real m_int_total_solve_time = 0;
-  Real m_int_total_setup_time = 0;
-  Real m_int_total_finish_time = 0;
   Real m_int_total_allocate_time = 0;
   Real m_int_total_init_time = 0;
   Real m_int_total_update_time = 0;

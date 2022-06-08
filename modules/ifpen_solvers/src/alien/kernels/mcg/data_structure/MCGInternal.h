@@ -14,7 +14,8 @@
 #include <x86intrin.h>
 #endif
 
-#include <MCGS.h>
+#include <BCSR/BCSRMatrix.h>
+#include <MCGSolver/BVector.h>
 
 #include <alien/kernels/mcg/MCGPrecomp.h>
 
@@ -61,7 +62,7 @@ class UniqueKey
 class MatrixInternal
 {
  public:
-  typedef MCGSolver::CSRProfile ProfileType;
+  typedef MCGSolver::CSRProfile<int,int> ProfileType;
   typedef MCGSolver::BCSRMatrix<double> MatrixType;
 
   UniqueKey m_key;

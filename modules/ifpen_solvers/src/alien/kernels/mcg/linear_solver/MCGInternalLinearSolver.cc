@@ -9,8 +9,6 @@
 
 #include <arccore/message_passing_mpi/MpiMessagePassingMng.h>
 
-#include <MCGS.h>
-
 #include <alien/data/Space.h>
 #include <alien/expression/solver/ILinearSolver.h>
 #include <alien/expression/solver/ILinearAlgebra.h>
@@ -34,6 +32,8 @@
 #include "alien/kernels/mcg/linear_solver/MCGInternalLinearSolver.h"
 
 #include "ALIEN/axl/MCGSolver_IOptions.h"
+
+#include <Common/Utils/Machine/MachineInfo.h>
 
 namespace Alien {
 
@@ -434,8 +434,6 @@ MCGInternalLinearSolver::printInfo() const
            << m_system_timer.getElapse() / total_solve_time << "\n"
            << "| |--solve time               : " << m_solve_timer.getElapse() << " "
            << m_solve_timer.getElapse() / total_solve_time << "\n"
-           << "|    |--internal setup time   : " << m_int_total_setup_time << " "
-           << m_int_total_setup_time / total_solve_time << "\n"
            << "|    |--internal allocate time: " << m_int_total_allocate_time << " "
            << m_int_total_allocate_time / total_solve_time << "\n"
            << "|    |--internal init time    : " << m_int_total_init_time << " "
@@ -444,8 +442,6 @@ MCGInternalLinearSolver::printInfo() const
            << m_int_total_update_time / total_solve_time << "\n"
            << "|    |--internal solve time   : " << m_int_total_solve_time << " "
            << m_int_total_solve_time / total_solve_time << "\n"
-           << "|    |--internal finish time  : " << m_int_total_finish_time << " "
-           << m_int_total_finish_time / total_solve_time << "\n"
            << std::defaultfloat
            << "|----------------------------------------------------|\n";
   });
@@ -601,8 +597,6 @@ MCGInternalLinearSolver::solve(IMatrix const& A, IVector const& b, IVector& x)
   m_solve_num += 1;
   m_total_iter_num += m_mcg_status.m_num_iter;
 
-  m_int_total_setup_time += m_mcg_status.m_setup_time;
-  m_int_total_finish_time += m_mcg_status.m_finish_time;
   m_int_total_solve_time += m_mcg_status.m_solve_time;
   m_int_total_allocate_time += m_mcg_status.m_allocate_time;
   m_int_total_init_time += m_mcg_status.m_init_time;
