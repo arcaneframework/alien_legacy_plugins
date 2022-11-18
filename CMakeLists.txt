@@ -3,7 +3,14 @@ cmake_minimum_required(VERSION 3.13)
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
 
-project(ALIEN) # Le nom est important car les axl sont générés dans <PROJECT_NAME>/axl
+
+file(READ "version" ALIEN_VERSION_STR_FULL)
+string(REPLACE "_dev" "" ALIEN_VERSION ${ALIEN_VERSION_STR_FULL})
+string(STRIP "${ALIEN_VERSION}" ALIEN_VERSION)  # In case of \n
+message(STATUS "AlienLegacyVersion = ${ALIEN_VERSION}")
+
+project(ALIEN 
+        VERSION ${ALIEN_VERSION}) # Le nom est important car les axl sont générés dans <PROJECT_NAME>/axl
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
@@ -38,7 +45,7 @@ set(Arcane_USE_CMAKE_CONFIG TRUE)
 #set(PETSc_USE_PKGCONFIG TRUE)
 #set(Hypre_USE_CMAKE_CONFIG TRUE)
 #set(MTL4_USE_CMAKE_CONFIG TRUE)
-set(SuperLU_USE_CMAKE_CONFIG TRUE)
+#set(SuperLU_USE_CMAKE_CONFIG TRUE)
 set(GTest_USE_CMAKE_CONFIG TRUE)
 set(TBB_USE_CMAKE_CONFIG TRUE)
 set(MPI_USE_CMAKE_CONFIG TRUE)
