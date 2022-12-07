@@ -265,7 +265,7 @@ MCGInternalLinearSolver::init()
   m_solver->setOpt(MCGSolver::PrecondOpt, m_precond_opt);
 
   m_solver->setOpt(MCGSolver::BlockJacobiNumOfIter, m_options->bjNumIter());
-  m_solver->setOpt(MCGSolver::BlockJacobiLocalSolver, m_options->bjLocalPrecond());
+  m_solver->setOpt(MCGSolver::BlockJacobiLocalSolver, bj_local_solver);
 
   m_solver->setOpt(MCGSolver::FPILUSolverNumIter, m_options->fpilu0SolveNumIter());
   m_solver->setOpt(MCGSolver::FPILUFactorNumIter, m_options->fpilu0FactoNumIter());

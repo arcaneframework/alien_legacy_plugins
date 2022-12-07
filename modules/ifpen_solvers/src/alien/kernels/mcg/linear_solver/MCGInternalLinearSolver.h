@@ -184,9 +184,9 @@ class ALIEN_IFPEN_SOLVERS_EXPORT MCGInternalLinearSolver : public ILinearSolver,
   std::string m_version;
   bool m_use_mpi = false;
   Arccore::MessagePassing::IMessagePassingMng* m_parallel_mng = nullptr;
-  MCGSolver::MachineInfo* m_machine_info = nullptr;
-  mpi::MPIInfo* m_mpi_info = nullptr;
-  MCGSolver::PartitionInfo* m_part_info = nullptr;
+  MCGSolver::MachineInfo* m_machine_info = nullptr; // TODO: use shared_ptr
+  mpi::MPIInfo* m_mpi_info = nullptr; // TODO: use shared_ptr
+  MCGSolver::PartitionInfo* m_part_info = nullptr; // TODO: use shared_ptr
 
   MCGSolver::Status m_mcg_status;
   Alien::SolverStatus m_status;
