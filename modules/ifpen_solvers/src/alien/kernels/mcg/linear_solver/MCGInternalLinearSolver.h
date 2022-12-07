@@ -10,11 +10,16 @@
 #include <memory>
 #include <chrono>
 
-#include <MCGSolver/SolverOptionsEnum.h>
-#include <Common/Utils/ParallelEnv.h>
 #include <MCGSolver/ILinearSystem.h>
+#include <Common/Utils/Machine/MachineInfo.h>
+#include <Common/Utils/ParallelEnv.h>
+#include <Graph/OrderingType.h>
+#include <Precond/PrecondOptionsEnum.h>
+#include <Solvers/AMG/AMGProperty.h>
+#include <Solvers/SolverProperty.h>
+#include <MCGSolver/Status.h>
+#include <MCGSolver/SolverOptionsEnum.h>
 #include <MCGSolver/ILinearSolver.h>
-
 
 #include <alien/utils/Precomp.h>
 #include <alien/core/backend/IInternalLinearSolverT.h>
@@ -85,7 +90,6 @@ class ALIEN_IFPEN_SOLVERS_EXPORT MCGInternalLinearSolver : public ILinearSolver,
 
   typedef MCGInternal::MatrixInternal MCGMatrixType;
   typedef MCGInternal::VectorInternal MCGVectorType;
-  typedef MCGInternal::CompositeVectorInternal MCGCompositeVectorType;
 
   typedef SimpleCSRMatrix<Real> CSRMatrixType;
   typedef SimpleCSRVector<Real> CSRVectorType;
@@ -147,35 +151,30 @@ class ALIEN_IFPEN_SOLVERS_EXPORT MCGInternalLinearSolver : public ILinearSolver,
   Integer _solve(const MCGMatrixType& A, const MCGVectorType& b, const MCGVectorType& x0,
       MCGVectorType& x, MCGSolver::PartitionInfo* part_info = nullptr);
 
-  Integer _solve(const MCGMatrixType& A, const MCGCompositeVectorType& b,
-      MCGCompositeVectorType& x, MCGSolver::PartitionInfo* part_info = nullptr);
-  Integer _solve(const MCGMatrixType& A, const MCGCompositeVectorType& b,
-      const MCGCompositeVectorType& x0, MCGCompositeVectorType& x,
+  bool _systemChanged(
+      const MCGMatrixType& A, const MCGVectorType& b, const MCGVectorType& x);
+  bool _systemChanged(const MCGMatrixType& A, const MCGVectorType& b,
+      const MCGVectorType& x0, const MCGVectorType& x);
+  bool _matrixChanged(const MCGMatrixType& A);
+  bool _rhsChanged(const MCGVectorType& b);
+  bool _x0Changed(const MCGVectorType& x0);
+
+  // bool _systemChanged(const MCGMatrixType& A,const MCGVectorType& b,const
+  // MCGVectorType& x0,const MCGVectorType& x);
+  void _registerKey(
+      const MCGMatrixType& A, const MCGVectorType& b, const MCGVectorType& x);
+  void _registerKey(const MCGMatrixType& A, const MCGVectorType& b,
+      const MCGVectorType& x0, const MCGVectorType& x);
+
+  typedef MCGSolver::ILinearSystem<double, MCGSolver::LinearSystem<double>>
+      MCGSolverLinearSystem;
+
+  MCGSolverLinearSystem* _createSystem(const MCGMatrixType& A, const MCGVectorType& b,
+      MCGVectorType& x, MCGSolver::PartitionInfo* part_info = nullptr);
+
+  MCGSolverLinearSystem* _createSystem(const MCGMatrixType& A, const MCGVectorType& b,
+      const MCGVectorType& x0, MCGVectorType& x,
       MCGSolver::PartitionInfo* part_info = nullptr);
-
-  // void updateLinearSystem();
-  bool _systemChanged(const MCGMatrixType& A,const MCGVectorType& b,const MCGVectorType& x);
-  bool _systemChanged(const MCGMatrixType& A,const MCGVectorType& b,const MCGVectorType& x0,const MCGVectorType& x);
-  void _registerKey(const MCGMatrixType& A,const MCGVectorType& b,const MCGVectorType& x);
-  void _registerKey(const MCGMatrixType& A,const MCGVectorType& b,const MCGVectorType& x0,const MCGVectorType& x);
-
-  typedef MCGSolver::ILinearSystem<double,MCGSolver::LinearSystem<double>> MCGSolverLinearSystem;
-
-  MCGSolverLinearSystem* _createSystem(const MCGMatrixType& A,
-      const MCGVectorType& b, MCGVectorType& x,
-      MCGSolver::PartitionInfo* part_info = nullptr);
-
-  MCGSolverLinearSystem* _createSystem(const MCGMatrixType& A,
-      const MCGVectorType& b, const MCGVectorType& x0, MCGVectorType& x,
-      MCGSolver::PartitionInfo* part_info = nullptr);
-
-  MCGSolverLinearSystem* _createSystem(const MCGMatrixType& A,
-      const MCGCompositeVectorType& b, MCGCompositeVectorType& x,
-      MCGSolver::PartitionInfo* part_info = nullptr);
-
-  MCGSolverLinearSystem* _createSystem(const MCGMatrixType& A,
-      const MCGCompositeVectorType& b, const MCGCompositeVectorType& x0,
-      MCGCompositeVectorType& x, MCGSolver::PartitionInfo* part_info = nullptr);
 
  protected:
   MCGSolver::ILinearSolver<MCGSolver::LinearSolver>* m_solver = nullptr;
@@ -187,6 +186,7 @@ class ALIEN_IFPEN_SOLVERS_EXPORT MCGInternalLinearSolver : public ILinearSolver,
   Arccore::MessagePassing::IMessagePassingMng* m_parallel_mng = nullptr;
   MCGSolver::MachineInfo* m_machine_info = nullptr;
   mpi::MPIInfo* m_mpi_info = nullptr;
+  MCGSolver::PartitionInfo* m_part_info = nullptr;
 
   MCGSolver::Status m_mcg_status;
   Alien::SolverStatus m_status;
@@ -198,13 +198,6 @@ class ALIEN_IFPEN_SOLVERS_EXPORT MCGInternalLinearSolver : public ILinearSolver,
   MCGSolver::eKrylovType m_solver_opt = MCGSolver::BiCGS;
   Integer m_max_iteration = 1000;
   Real m_precision = 1e-6;
-
-  //! Linear system builder options
-  //!@{
-  bool m_use_unit_diag = false;
-  bool m_keep_diag_opt = false;
-  Integer m_normalize_opt = 0;
-  //!@}
 
   String m_matrix_file_name;
 
@@ -239,12 +232,25 @@ class ALIEN_IFPEN_SOLVERS_EXPORT MCGInternalLinearSolver : public ILinearSolver,
   std::map<std::string, int> m_dir_enum;
 
   MCGSolverLinearSystem* m_system = nullptr;
+
   MCGInternal::UniqueKey m_A_key;
+  Integer m_A_time_stamp = 0;
+  bool m_A_update = true;
+
   MCGInternal::UniqueKey m_b_key;
+  Integer m_b_time_stamp = 0;
+  bool m_b_update = true;
+
   MCGInternal::UniqueKey m_x_key;
+
   MCGInternal::UniqueKey m_x0_key;
+  Integer m_x0_time_stamp = 0;
+  bool m_x0_update = true;
 
   std::vector<int> m_edge_weight;
+#if 0  
+  std::unique_ptr<ILogger> m_logger;
+#endif
 };
 
 } // namespace Alien

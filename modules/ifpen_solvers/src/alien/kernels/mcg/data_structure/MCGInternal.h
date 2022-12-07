@@ -16,6 +16,7 @@
 
 #include <BCSR/BCSRMatrix.h>
 #include <MCGSolver/BVector.h>
+#include <Precond/PrecondEquation.h>
 
 #include <alien/kernels/mcg/MCGPrecomp.h>
 
@@ -62,16 +63,21 @@ class UniqueKey
 class MatrixInternal
 {
  public:
-  typedef MCGSolver::CSRProfile<int,int> ProfileType;
+  typedef MCGSolver::CSRProfile<int, int> ProfileType;
   typedef MCGSolver::BCSRMatrix<double> MatrixType;
+
+  bool m_elliptic_split_tag = false;
+  MCGSolver::BVector<MCGSolver::Equation::eType>* m_equation_type = nullptr;
 
   UniqueKey m_key;
   std::shared_ptr<MatrixType> m_matrix[2][2] = { { nullptr, nullptr },
     { nullptr, nullptr } };
 
+  std::vector<int> m_elem_perm;
+
   MatrixInternal() {}
 
-  ~MatrixInternal() {}
+  ~MatrixInternal() { delete m_equation_type; }
 };
 
 class VectorInternal
