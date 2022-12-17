@@ -60,42 +60,42 @@ jobs:
           - {
             name: "foss/2021b el7 with arcane",
             image: "ghcr.io/cedricga91/arcane-ifpen-devenv-foss-2021b:el7",
-            with_arcane: "1"
+            with_arcane: "1",
           }
           - {
             name: "foss/2021b el8 with arcane",
             image: "ghcr.io/cedricga91/arcane-ifpen-devenv-foss-2021b:el8",
-            with_arcane: "1"
+            with_arcane: "1",
           }
           - {
             name: "gimkl/2021b el7 with arcane",
             image: "ghcr.io/cedricga91/arcane-ifpen-devenv-gimkl-2021b:el7",
-            with_arcane: "1"
+            with_arcane: "1",
           }
           - {
             name: "gimkl/2021b el8 with arcane",
             image: "ghcr.io/cedricga91/arcane-ifpen-devenv-gimkl-2021b:el8",
-            with_arcane: "1"
+            with_arcane: "1",
           }
           - {
             name: "foss/2021b el7 without arcane",
             image: "ghcr.io/cedricga91/arcane-ifpen-devenv-foss-2021b:el7",
-            with_arcane: "0"
+            with_arcane: "0",
           }
           - {
             name: "foss/2021b el8 without arcane",
             image: "ghcr.io/cedricga91/arcane-ifpen-devenv-foss-2021b:el8",
-            with_arcane: "0"
+            with_arcane: "0",
           }
           - {
             name: "gimkl/2021b el7 without arcane",
             image: "ghcr.io/cedricga91/arcane-ifpen-devenv-gimkl-2021b:el7",
-            with_arcane: "0"
+            with_arcane: "0",
           }
           - {
             name: "gimkl/2021b el8 without arcane",
             image: "ghcr.io/cedricga91/arcane-ifpen-devenv-gimkl-2021b:el8",
-            with_arcane: "0"
+            with_arcane: "0",
           }
     steps:
 
@@ -198,23 +198,30 @@ jobs:
         run: cmake --install ${{ env.ARCCORE_BUILD_DIR }}
 
       # Arcane installation
+      - name: Check with arcane
+        id: check_with_arcane
+        run: echo "enable=${{ matrix.with_arcane }}"
       - name: Checkout Arcane
-        if: ${{ matrix.with_arcane == '1' }}
+        #if: ${{ matrix.with_arcane == '1' }}
+        if: ${{ check_with_arcane.outputs.enable == 1 }}
         uses: actions/checkout@v3
         with:
           repository: arcaneframework/framework
           path: ${{ env.ARCANE_SOURCE_DIR }}
           ref: main
       - name: Configure Arcane
-        if: ${{ matrix.with_arcane == '1' }}
+        #if: ${{ matrix.with_arcane == '1' }}
+        if: ${{ check_with_arcane.outputs.enable == 1 }}
         shell: bash
         run: cmake -S ${{ env.ARCANE_SOURCE_DIR }}/arcane -B ${{ env.ARCANE_BUILD_DIR }} -DCMAKE_BUILD_TYPE=${{ env.CM_BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=${{ env.ARCANE_INSTALL_DIR }} -DArccon_ROOT=${{ env.ARCCON_INSTALL_DIR }} -DArccore_DIR=${{ env.ARCCORE_INSTALL_DIR }}/lib/cmake/Arccore -DAxlstar_DIR=${{ env.AXLSTAR_INSTALL_DIR }}/share/cmake/Axlstar -DArcDependencies_ROOT=${{ env.DEPENDENCIES_INSTALL_DIR }} -DBUILD_SHARED_LIBS=ON -DARCANE_DEFAULT_PARTITIONER=Metis -DARCANE_WANT_TOTALVIEW=ON -DARCANE_WANT_LIBXML2=ON -DARCANE_WANT_LEGACY_CONNECTIVITY=OFF -DARCANE_WANT_CHECK=OFF -DARCANE_WANT_ARCCON_EXPORT_TARGET=OFF -DARCANE_DISABLE_PERFCOUNTER_TESTS=ON ${{ env.CM_CCACHE_OPTS }}
       - name: Build Arcane
-        if: ${{ matrix.with_arcane == '1' }}
+        #if: ${{ matrix.with_arcane == '1' }}
+        if: ${{ check_with_arcane.outputs.enable == 1 }}
         shell: bash
         run: cmake --build ${{ env.ARCANE_BUILD_DIR }} ${{ env.CM_BUILD_OPTS }}
       - name: Install Arcane
-        if: ${{ matrix.with_arcane == '1' }}
+        #if: ${{ matrix.with_arcane == '1' }}
+        if: ${{ check_with_arcane.outputs.enable == 1 }}
         shell: bash
         run: cmake --install ${{ env.ARCANE_BUILD_DIR }}
 
