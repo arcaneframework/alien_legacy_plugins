@@ -58,19 +58,19 @@ jobs:
       matrix:
         config:
           - {
-            name: "el7 foss/2021b",
+            name: "foss/2021b el7",
             container: "ghcr.io/cedricga91/arcane-ifpen-devenv-foss-2021b:el7",
           }
           - {
-            name: "el8 foss/2021b",
+            name: "foss/2021b el8",
             container: "ghcr.io/cedricga91/arcane-ifpen-devenv-foss-2021b:el8",
           }
           - {
-            name: "el7 gimkl/2021b",
+            name: "gimkl/2021b el7",
             container: "ghcr.io/cedricga91/arcane-ifpen-devenv-gimkl-2021b:el7",
           }
           - {
-            name: "el8 gimkl/2021b",
+            name: "gimkl/2021b el8",
             container: "ghcr.io/cedricga91/arcane-ifpen-devenv-gimkl-2021b:el8",
           }
     steps:
