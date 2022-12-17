@@ -203,7 +203,7 @@ jobs:
         run: echo "enable=${{ matrix.with_arcane }}"
       - name: Checkout Arcane
         #if: ${{ matrix.with_arcane == '1' }}
-        if: ${{ check_with_arcane.outputs.enable == 1 }}
+        if: check_with_arcane.outputs.enable == 1
         uses: actions/checkout@v3
         with:
           repository: arcaneframework/framework
