@@ -1,4 +1,4 @@
-name: IFPEN el7 gimkl/2018b
+name: IFPEN el7 gimkl/2021b
 
 on:
   push:
@@ -35,7 +35,7 @@ env:
   AXLSTAR_INSTALL_DIR: /__w/alien_legacy_plugins/alien_legacy_plugins/axlstar_install
   AXLSTAR_SOURCE_DIR: /__w/alien_legacy_plugins/alien_legacy_plugins/axlstar
   # ccache
-  CC_KEY_PREFIX: ifpen-el7-gimkl-2018b
+  CC_KEY_PREFIX: ifpen-el7-gimkl-2021b
   CCACHE_COMPRESS: true
   CCACHE_COMPRESSLEVEL: 6
   CCACHE_DIR: '/__w/alien_legacy_plugins/alien_legacy_plugins/ccache'
@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     container:
-      image: ghcr.io/cedricga91/centos-gimkl-2021b-alienlegacy:7-latest
+      image: ghcr.io/cedricga91/arcane-ifpen-devenv-gimkl-2021b:el7
     strategy:
       fail-fast: false
     steps:
