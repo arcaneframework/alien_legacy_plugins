@@ -216,7 +216,7 @@ jobs:
         id: checkout-arccore
         if: |
           (success() || failure()) &&
-          steps.install-arccon.outcome == 'success' &&
+          steps.install-arccon.outcome == 'success'
         uses: actions/checkout@v3
         with:
           repository: arcaneframework/framework
@@ -226,14 +226,14 @@ jobs:
         id: configure-arccore
         if: |
           (success() || failure()) &&
-          steps.checkout-arccore.outcome == 'success' &&
+          steps.checkout-arccore.outcome == 'success'
         shell: bash
         run: cmake -S ${{ env.ARCCORE_SOURCE_DIR }}/arccore -B ${{ env.ARCCORE_BUILD_DIR }} -DCMAKE_BUILD_TYPE=${{ env.CM_BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=${{ env.ARCCORE_INSTALL_DIR }} -DArccon_ROOT=${{ env.ARCCON_INSTALL_DIR }} -DBUILD_SHARED_LIBS=ON ${{ env.CM_CCACHE_OPTS }}
       - name: Build Arccore
         id: build-arccore
         if: |
           (success() || failure()) &&
-          steps.configure-arccore.outcome == 'success' &&
+          steps.configure-arccore.outcome == 'success'
         shell: bash
         run: cmake --build ${{ env.ARCCORE_BUILD_DIR }} ${{ env.CM_BUILD_OPTS }}
       - name: Install Arccore
@@ -290,7 +290,7 @@ jobs:
         if: |
           (success() || failure()) &&
           steps.install-arccon.outcome == 'success' &&
-          steps.install-arccore.outcome == 'success' &&
+          steps.install-arccore.outcome == 'success'
         uses: actions/checkout@v3
         with:
           repository: arcaneframework/alien
@@ -300,14 +300,14 @@ jobs:
         id: configure-alien
         if: |
           (success() || failure()) &&
-          steps.checkout-alien.outcome == 'success' &&
+          steps.checkout-alien.outcome == 'success'
         shell: bash
         run: cmake -S ${{ env.ALIEN_SOURCE_DIR }} -B ${{ env.ALIEN_BUILD_DIR }} -DCMAKE_BUILD_TYPE=${{ env.CM_BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=${{ env.ALIEN_INSTALL_DIR }} -DALIENDEV_EMBEDDED=OFF -DArccon_ROOT=${{ env.ARCCON_INSTALL_DIR }} -DArccore_DIR=${{ env.ARCCORE_INSTALL_DIR }}/lib/cmake/Arccore -DCMAKE_FIND_DEBUG_MODE=1 -DVerbose=ON -DBoost_NO_BOOST_CMAKE=ON -DBUILD_SHARED_LIBS=ON -DALIEN_USE_HDF5=ON ${{ env.CM_CCACHE_OPTS }}
       - name: Build Alien
         id: build-alien
         if: |
           (success() || failure()) &&
-          steps.configure-alien.outcome == 'success' &&
+          steps.configure-alien.outcome == 'success'
         shell: bash
         run: cmake --build ${{ env.ALIEN_BUILD_DIR }} ${{ env.CM_BUILD_OPTS }}
       - name: Install Alien
@@ -327,7 +327,7 @@ jobs:
           steps.install-dependencies.outcome == 'success' &&
           steps.install-axlstar.outcome == 'success' &&
           steps.install-arccore.outcome == 'success' &&
-          steps.install-alien.outcome == 'success' &&
+          steps.install-alien.outcome == 'success'
         uses: actions/checkout@v3
         with:
           path: ${{ env.ALIENLEGACYPLUGINS_SOURCE_DIR }}
@@ -359,7 +359,7 @@ jobs:
         id: test-arccore
         if: |
           (success() || failure()) &&
-          steps.install-arccore.outcome == 'success' &&
+          steps.install-arccore.outcome == 'success'
         shell: bash
         run: ctest --test-dir ${{ env.ARCCORE_BUILD_DIR }} ${{ env.CT_OPTS }}
       - name: Upload test Arccore artifact
@@ -377,7 +377,7 @@ jobs:
         if: |
           (success() || failure()) &&
           matrix.config.with_arcane == '1' &&
-          steps.install-arcane.outcome == 'success' &&
+          steps.install-arcane.outcome == 'success'
         shell: bash
         run: ctest --test-dir ${{ env.ARCANE_BUILD_DIR }} ${{ env.CT_OPTS }} -E '^hydro5_4proc_3sd_4proc$'
       - name: Upload test Arcane artifact
@@ -394,7 +394,7 @@ jobs:
         id: test-alien
         if: |
           (success() || failure()) &&
-          steps.install-alien.outcome == 'success' &&
+          steps.install-alien.outcome == 'success'
         shell: bash
         run: ctest --test-dir ${{ env.ALIEN_BUILD_DIR }} ${{ env.CT_OPTS }}
       - name: Upload test Alien artifact
@@ -411,7 +411,7 @@ jobs:
         id: test-alienlegacyplugins
         if: |
           (success() || failure()) &&
-          steps.install-alienlegacyplugins.outcome == 'success' &&
+          steps.install-alienlegacyplugins.outcome == 'success'
         shell: bash
         run: ctest --test-dir ${{ env.ALIENLEGACYPLUGINS_BUILD_DIR }} ${{ env.CT_OPTS }} -E '^(alien.interface.c.seq.mpi-1|alien.interface.fortran.seq.mpi-1)$'
       - name: Upload test AlienLegacyPlugins artifact
