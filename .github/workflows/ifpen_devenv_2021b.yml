@@ -368,6 +368,20 @@ jobs:
       # Arccore tests
       - name: Test Arccore
         id: test-arccore
+        #if: |
+        #  steps.install-arccore.outcome == 'success' &&
+        #  (steps.configure-dependencies.outcome == 'success' || steps.configure-dependencies.outcome == 'failure') &&
+        #  (steps.build-dependencies.outcome == 'success' || steps.build-dependencies.outcome == 'failure') &&
+        #  (steps.install-dependencies.outcome == 'success' || steps.install-dependencies.outcome == 'failure') &&
+        #  (steps.configure-axlstar.outcome == 'success' || steps.configure-axlstar.outcome == 'failure') &&
+        #  (steps.build-axlstar.outcome == 'success' || steps.build-axlstar.outcome == 'failure') &&
+        #  (steps.install-axlstar.outcome == 'success' || steps.install-axlstar.outcome == 'failure') &&
+        #  ((matrix.config.with_arcane == '1' && (steps.configure-arcane.outcome == 'success' || steps.configure-arcane.outcome == 'failure')) &&
+        #  ((matrix.config.with_arcane == '1' && (steps.build-arcane.outcome == 'success' || steps.build-arcane.outcome == 'failure')) &&
+        #  ((matrix.config.with_arcane == '1' && (steps.install-arcane.outcome == 'success' || steps.install-arcane.outcome == 'failure')) &&
+        #  (steps.configure-alienlegacyplugins.outcome == 'success' || steps.configure-alienlegacyplugins.outcome == 'failure') &&
+        #  (steps.build-alienlegacyplugins.outcome == 'success' || steps.build-alienlegacyplugins.outcome == 'failure') &&
+        #  ((matrix.config.with_arcane == '1' && (steps.install-alienlegacyplugins.outcome == 'success' || steps.install-alienlegacyplugins.outcome == 'failure'))
         if: |
           steps.install-arccore.outcome == 'success' &&
           (steps.configure-dependencies.outcome == 'success' || steps.configure-dependencies.outcome == 'failure') &&
@@ -376,12 +390,8 @@ jobs:
           (steps.configure-axlstar.outcome == 'success' || steps.configure-axlstar.outcome == 'failure') &&
           (steps.build-axlstar.outcome == 'success' || steps.build-axlstar.outcome == 'failure') &&
           (steps.install-axlstar.outcome == 'success' || steps.install-axlstar.outcome == 'failure') &&
-          ((matrix.config.with_arcane == '1' && (steps.configure-arcane.outcome == 'success' || steps.configure-arcane.outcome == 'failure')) &&
-          ((matrix.config.with_arcane == '1' && (steps.build-arcane.outcome == 'success' || steps.build-arcane.outcome == 'failure')) &&
-          ((matrix.config.with_arcane == '1' && (steps.install-arcane.outcome == 'success' || steps.install-arcane.outcome == 'failure')) &&
           (steps.configure-alienlegacyplugins.outcome == 'success' || steps.configure-alienlegacyplugins.outcome == 'failure') &&
-          (steps.build-alienlegacyplugins.outcome == 'success' || steps.build-alienlegacyplugins.outcome == 'failure') &&
-          ((matrix.config.with_arcane == '1' && (steps.install-alienlegacyplugins.outcome == 'success' || steps.install-alienlegacyplugins.outcome == 'failure'))
+          (steps.build-alienlegacyplugins.outcome == 'success' || steps.build-alienlegacyplugins.outcome == 'failure')
         shell: bash
         run: ctest --test-dir ${{ env.ARCCORE_BUILD_DIR }} ${{ env.CT_OPTS }}
       - name: Upload test Arccore artifact
