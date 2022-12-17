@@ -124,21 +124,18 @@ jobs:
           path: ${{ env.ARCCON_SOURCE_DIR }}
           ref: main
       - name: Configure Arccon
-        continue-on-error: true
         id: configure-arccon
         if: |
           steps.checkout-arccon.outcome == 'success'
         shell: bash
         run: cmake -S ${{ env.ARCCON_SOURCE_DIR }}/arccon -B ${{ env.ARCCON_BUILD_DIR }} -DCMAKE_BUILD_TYPE=${{ env.CM_BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=${{ env.ARCCON_INSTALL_DIR }}
       - name: Build Arccon
-        continue-on-error: true
         id: build-arccon
         if: |
           steps.configure-arccon.outcome == 'success'
         shell: bash
         run: cmake --build ${{ env.ARCCON_BUILD_DIR }} ${{ env.CM_BUILD_OPTS }}
       - name: Install Arccon
-        continue-on-error: true
         id: install-arccon
         if: |
           steps.build-arccon.outcome == 'success'
@@ -156,21 +153,18 @@ jobs:
           path: ${{ env.DEPENDENCIES_SOURCE_DIR }}
           ref: main
       - name: Configure Dependencies
-        continue-on-error: true
         id: configure-dependencies
         if: |
           steps.checkout-dependencies.outcome == 'success'
         shell: bash
         run: cmake -S ${{ env.DEPENDENCIES_SOURCE_DIR }} -B ${{ env.DEPENDENCIES_BUILD_DIR }} -DCMAKE_BUILD_TYPE=${{ env.CM_BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=${{ env.DEPENDENCIES_INSTALL_DIR }} -DArccon_ROOT=${{ env.ARCCON_INSTALL_DIR }}
       - name: Build Dependencies
-        continue-on-error: true
         id: build-dependencies
         if: |
           steps.configure-dependencies.outcome == 'success'
         shell: bash
         run: cmake --build ${{ env.DEPENDENCIES_BUILD_DIR }} ${{ env.CM_BUILD_OPTS }}
       - name: Install Dependencies
-        continue-on-error: true
         id: install-dependencies
         if: |
           steps.build-dependencies.outcome == 'success'
@@ -189,21 +183,18 @@ jobs:
           path: ${{ env.AXLSTAR_SOURCE_DIR }}
           ref: main
       - name: Configure Axlstar
-        continue-on-error: true
         id: configure-axlstar
         if: |
           steps.checkout-axlstar.outcome == 'success'
         shell: bash
         run: cmake -S ${{ env.AXLSTAR_SOURCE_DIR }}/axlstar -B ${{ env.AXLSTAR_BUILD_DIR }} -DCMAKE_BUILD_TYPE=${{ env.CM_BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=${{ env.AXLSTAR_INSTALL_DIR }} -DArccon_ROOT=${{ env.ARCCON_INSTALL_DIR }} -DArcDependencies_ROOT=${{ env.DEPENDENCIES_INSTALL_DIR }}
       - name: Build Axlstar
-        continue-on-error: true
         id: build-axlstar
         if: |
           steps.configure-axlstar.outcome == 'success'
         shell: bash
         run: cmake --build ${{ env.AXLSTAR_BUILD_DIR }} ${{ env.CM_BUILD_OPTS }}
       - name: Install Axlstar
-        continue-on-error: true
         id: install-axlstar
         if: |
           steps.build-axlstar.outcome == 'success'
@@ -214,28 +205,43 @@ jobs:
       - name: Checkout Arccore
         id: checkout-arccore
         if: |
-          steps.install-arccon.outcome == 'success'
+          steps.install-arccon.outcome == 'success' &&
+          (steps.configure-dependencies.outcome == 'success' || steps.configure-dependencies.outcome == 'failure') &&
+          (steps.build-dependencies.outcome == 'success' || steps.build-dependencies.outcome == 'failure') &&
+          (steps.install-dependencies.outcome == 'success' || steps.install-dependencies.outcome == 'failure') &&
+          (steps.configure-axlstar.outcome == 'success' || steps.configure-axlstar.outcome == 'failure') &&
+          (steps.build-axlstar.outcome == 'success' || steps.build-axlstar.outcome == 'failure') &&
+          (steps.install-axlstar.outcome == 'success' || steps.install-axlstar.outcome == 'failure')
         uses: actions/checkout@v3
         with:
           repository: arcaneframework/framework
           path: ${{ env.ARCCORE_SOURCE_DIR }}
           ref: main
       - name: Configure Arccore
-        continue-on-error: true
         id: configure-arccore
         if: |
-          steps.checkout-arccore.outcome == 'success'
+          steps.checkout-arccore.outcome == 'success' &&
+          (steps.configure-dependencies.outcome == 'success' || steps.configure-dependencies.outcome == 'failure') &&
+          (steps.build-dependencies.outcome == 'success' || steps.build-dependencies.outcome == 'failure') &&
+          (steps.install-dependencies.outcome == 'success' || steps.install-dependencies.outcome == 'failure') &&
+          (steps.configure-axlstar.outcome == 'success' || steps.configure-axlstar.outcome == 'failure') &&
+          (steps.build-axlstar.outcome == 'success' || steps.build-axlstar.outcome == 'failure') &&
+          (steps.install-axlstar.outcome == 'success' || steps.install-axlstar.outcome == 'failure')
         shell: bash
         run: cmake -S ${{ env.ARCCORE_SOURCE_DIR }}/arccore -B ${{ env.ARCCORE_BUILD_DIR }} -DCMAKE_BUILD_TYPE=${{ env.CM_BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=${{ env.ARCCORE_INSTALL_DIR }} -DArccon_ROOT=${{ env.ARCCON_INSTALL_DIR }} -DBUILD_SHARED_LIBS=ON ${{ env.CM_CCACHE_OPTS }}
       - name: Build Arccore
-        continue-on-error: true
         id: build-arccore
         if: |
-          steps.configure-arccore.outcome == 'success'
+          steps.configure-arccore.outcome == 'success' &&
+          (steps.configure-dependencies.outcome == 'success' || steps.configure-dependencies.outcome == 'failure') &&
+          (steps.build-dependencies.outcome == 'success' || steps.build-dependencies.outcome == 'failure') &&
+          (steps.install-dependencies.outcome == 'success' || steps.install-dependencies.outcome == 'failure') &&
+          (steps.configure-axlstar.outcome == 'success' || steps.configure-axlstar.outcome == 'failure') &&
+          (steps.build-axlstar.outcome == 'success' || steps.build-axlstar.outcome == 'failure') &&
+          (steps.install-axlstar.outcome == 'success' || steps.install-axlstar.outcome == 'failure')
         shell: bash
         run: cmake --build ${{ env.ARCCORE_BUILD_DIR }} ${{ env.CM_BUILD_OPTS }}
       - name: Install Arccore
-        continue-on-error: true
         id: install-arccore
         if: |
           steps.build-arccore.outcome == 'success'
@@ -257,7 +263,6 @@ jobs:
           path: ${{ env.ARCANE_SOURCE_DIR }}
           ref: main
       - name: Configure Arcane
-        continue-on-error: true
         id: configure-arcane
         if: |
           matrix.config.with_arcane == '1' &&
@@ -265,7 +270,6 @@ jobs:
         shell: bash
         run: cmake -S ${{ env.ARCANE_SOURCE_DIR }}/arcane -B ${{ env.ARCANE_BUILD_DIR }} -DCMAKE_BUILD_TYPE=${{ env.CM_BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=${{ env.ARCANE_INSTALL_DIR }} -DArccon_ROOT=${{ env.ARCCON_INSTALL_DIR }} -DArccore_DIR=${{ env.ARCCORE_INSTALL_DIR }}/lib/cmake/Arccore -DAxlstar_DIR=${{ env.AXLSTAR_INSTALL_DIR }}/share/cmake/Axlstar -DArcDependencies_ROOT=${{ env.DEPENDENCIES_INSTALL_DIR }} -DBUILD_SHARED_LIBS=ON -DARCANE_DEFAULT_PARTITIONER=Metis -DARCANE_WANT_TOTALVIEW=ON -DARCANE_WANT_LIBXML2=ON -DARCANE_WANT_LEGACY_CONNECTIVITY=OFF -DARCANE_WANT_CHECK=OFF -DARCANE_WANT_ARCCON_EXPORT_TARGET=OFF -DARCANE_DISABLE_PERFCOUNTER_TESTS=ON ${{ env.CM_CCACHE_OPTS }}
       - name: Build Arcane
-        continue-on-error: true
         id: build-arcane
         if: |
           matrix.config.with_arcane == '1' &&
@@ -273,7 +277,6 @@ jobs:
         shell: bash
         run: cmake --build ${{ env.ARCANE_BUILD_DIR }} ${{ env.CM_BUILD_OPTS }}
       - name: Install Arcane
-        continue-on-error: true
         id: install-arcane
         if: |
           matrix.config.with_arcane == '1' &&
@@ -286,28 +289,43 @@ jobs:
         id: checkout-alien
         if: |
           steps.install-arccon.outcome == 'success' &&
-          steps.install-arccore.outcome == 'success'
+          steps.install-arccore.outcome == 'success' &&
+          (steps.configure-dependencies.outcome == 'success' || steps.configure-dependencies.outcome == 'failure') &&
+          (steps.build-dependencies.outcome == 'success' || steps.build-dependencies.outcome == 'failure') &&
+          (steps.install-dependencies.outcome == 'success' || steps.install-dependencies.outcome == 'failure') &&
+          (steps.configure-axlstar.outcome == 'success' || steps.configure-axlstar.outcome == 'failure') &&
+          (steps.build-axlstar.outcome == 'success' || steps.build-axlstar.outcome == 'failure') &&
+          (steps.install-axlstar.outcome == 'success' || steps.install-axlstar.outcome == 'failure')
         uses: actions/checkout@v3
         with:
           repository: arcaneframework/alien
           path: ${{ env.ALIEN_SOURCE_DIR }}
           ref: main
       - name: Configure Alien
-        continue-on-error: true
         id: configure-alien
         if: |
-          steps.checkout-alien.outcome == 'success'
+          steps.checkout-alien.outcome == 'success' &&
+          (steps.configure-dependencies.outcome == 'success' || steps.configure-dependencies.outcome == 'failure') &&
+          (steps.build-dependencies.outcome == 'success' || steps.build-dependencies.outcome == 'failure') &&
+          (steps.install-dependencies.outcome == 'success' || steps.install-dependencies.outcome == 'failure') &&
+          (steps.configure-axlstar.outcome == 'success' || steps.configure-axlstar.outcome == 'failure') &&
+          (steps.build-axlstar.outcome == 'success' || steps.build-axlstar.outcome == 'failure') &&
+          (steps.install-axlstar.outcome == 'success' || steps.install-axlstar.outcome == 'failure')
         shell: bash
         run: cmake -S ${{ env.ALIEN_SOURCE_DIR }} -B ${{ env.ALIEN_BUILD_DIR }} -DCMAKE_BUILD_TYPE=${{ env.CM_BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=${{ env.ALIEN_INSTALL_DIR }} -DALIENDEV_EMBEDDED=OFF -DArccon_ROOT=${{ env.ARCCON_INSTALL_DIR }} -DArccore_DIR=${{ env.ARCCORE_INSTALL_DIR }}/lib/cmake/Arccore -DCMAKE_FIND_DEBUG_MODE=1 -DVerbose=ON -DBoost_NO_BOOST_CMAKE=ON -DBUILD_SHARED_LIBS=ON -DALIEN_USE_HDF5=ON ${{ env.CM_CCACHE_OPTS }}
       - name: Build Alien
-        continue-on-error: true
         id: build-alien
         if: |
-          steps.configure-alien.outcome == 'success'
+          steps.configure-alien.outcome == 'success' &&
+          (steps.configure-dependencies.outcome == 'success' || steps.configure-dependencies.outcome == 'failure') &&
+          (steps.build-dependencies.outcome == 'success' || steps.build-dependencies.outcome == 'failure') &&
+          (steps.install-dependencies.outcome == 'success' || steps.install-dependencies.outcome == 'failure') &&
+          (steps.configure-axlstar.outcome == 'success' || steps.configure-axlstar.outcome == 'failure') &&
+          (steps.build-axlstar.outcome == 'success' || steps.build-axlstar.outcome == 'failure') &&
+          (steps.install-axlstar.outcome == 'success' || steps.install-axlstar.outcome == 'failure')
         shell: bash
         run: cmake --build ${{ env.ALIEN_BUILD_DIR }} ${{ env.CM_BUILD_OPTS }}
       - name: Install Alien
-        continue-on-error: true
         id: install-alien
         if: |
           steps.build-alien.outcome == 'success'
@@ -321,6 +339,7 @@ jobs:
           steps.install-arccon.outcome == 'success' &&
           steps.install-dependencies.outcome == 'success' &&
           steps.install-axlstar.outcome == 'success' &&
+          steps.install-arccore.outcome == 'success' &&
           steps.install-alien.outcome == 'success' &&
           (steps.install-arcane.outcome == 'success' || matrix.config.with_arcane == '0')
         uses: actions/checkout@v3
@@ -328,21 +347,18 @@ jobs:
           path: ${{ env.ALIENLEGACYPLUGINS_SOURCE_DIR }}
           submodules: true
       - name: Configure AlienLegacyPlugins
-        continue-on-error: true
         id: configure-alienlegacyplugins
         if: |
           steps.checkout-alienlegacyplugins.outcome == 'success'
         shell: bash
         run: cmake -S ${{ env.ALIENLEGACYPLUGINS_SOURCE_DIR }} -B ${{ env.ALIENLEGACYPLUGINS_BUILD_DIR }} -DCMAKE_BUILD_TYPE=${{ env.CM_BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=${{ env.ALIENLEGACYPLUGINS_INSTALL_DIR }} -DBUILD_SHARED_LIBS=ON -DArccon_ROOT=${{ env.ARCCON_INSTALL_DIR }} -DArccore_ROOT=${{ env.ARCCORE_INSTALL_DIR }} -DAxlstar_ROOT=${{ env.AXLSTAR_INSTALL_DIR }} -DArcane_ROOT=${{ env.ARCANE_INSTALL_DIR }} -DAlien_ROOT=${{ env.ALIEN_INSTALL_DIR }} -DUSE_BUILDSYSTEM_GIT_SUBMODULE=ON ${{ env.CM_CCACHE_OPTS }}
       - name: Build AlienLegacyPlugins
-        continue-on-error: true
         id: build-alienlegacyplugins
         if: |
           steps.configure-alienlegacyplugins.outcome == 'success'
         shell: bash
         run: cmake --build ${{ env.ALIENLEGACYPLUGINS_BUILD_DIR }} ${{ env.CM_BUILD_OPTS }}
       - name: Install AlienLegacyPlugins
-        continue-on-error: true
         id: install-alienlegacyplugins
         if: |
           steps.build-alienlegacyplugins.outcome == 'success'
@@ -351,10 +367,23 @@ jobs:
 
       # Arccore tests
       - name: Test Arccore
-        continue-on-error: true
         id: test-arccore
         if: |
           steps.install-arccore.outcome == 'success'
+          (steps.configure-dependencies.outcome == 'success' || steps.configure-dependencies.outcome == 'failure') &&
+          (steps.build-dependencies.outcome == 'success' || steps.build-dependencies.outcome == 'failure') &&
+          (steps.install-dependencies.outcome == 'success' || steps.install-dependencies.outcome == 'failure') &&
+          (steps.configure-axlstar.outcome == 'success' || steps.configure-axlstar.outcome == 'failure') &&
+          (steps.build-axlstar.outcome == 'success' || steps.build-axlstar.outcome == 'failure') &&
+          (steps.install-axlstar.outcome == 'success' || steps.install-axlstar.outcome == 'failure')
+          ((matrix.config.with_arcane == '1' && (steps.configure-arcane.outcome == 'success' || steps.configure-arcane.outcome == 'failure')) &&
+          ((matrix.config.with_arcane == '1' && (steps.build-arcane.outcome == 'success' || steps.build-arcane.outcome == 'failure')) &&
+          ((matrix.config.with_arcane == '1' && (steps.install-arcane.outcome == 'success' || steps.install-arcane.outcome == 'failure')) &&
+          (steps.configure-alienlegacyplugins.outcome == 'success' || steps.configure-alienlegacyplugins.outcome == 'failure') &&
+          (steps.build-alienlegacyplugins.outcome == 'success' || steps.build-alienlegacyplugins.outcome == 'failure') &&
+          ((matrix.config.with_arcane == '1' && (steps.install-alienlegacyplugins.outcome == 'success' || steps.install-alienlegacyplugins.outcome == 'failure')) &&
+
+
         shell: bash
         run: ctest --test-dir ${{ env.ARCCORE_BUILD_DIR }} ${{ env.CT_OPTS }}
       - name: Upload test Arccore artifact
@@ -368,11 +397,17 @@ jobs:
 
       # Arcane tests
       - name: Test Arcane
-        continue-on-error: true
         id: test-arcane
         if: |
           matrix.config.with_arcane == '1' &&
-          steps.install-arcane.outcome == 'success'
+          steps.install-arcane.outcome == 'success' &&
+          (steps.configure-alien.outcome == 'success' || steps.configure-alien.outcome == 'failure') &&
+          (steps.build-alien.outcome == 'success' || steps.build-alien.outcome == 'failure') &&
+          (steps.install-alien.outcome == 'success' || steps.install-alien.outcome == 'failure') &&
+          (steps.configure-alienlegacyplugins.outcome == 'success' || steps.configure-alienlegacyplugins.outcome == 'failure') &&
+          (steps.build-alienlegacyplugins.outcome == 'success' || steps.build-alienlegacyplugins.outcome == 'failure') &&
+          (steps.install-alienlegacyplugins.outcome == 'success' || steps.install-alienlegacyplugins.outcome == 'failure') &&
+          (steps.test-arccore.outcome == 'success' || steps.test-arccore.outcome == 'failure') &&
         shell: bash
         run: ctest --test-dir ${{ env.ARCANE_BUILD_DIR }} ${{ env.CT_OPTS }} -E '^hydro5_4proc_3sd_4proc$'
       - name: Upload test Arcane artifact
@@ -386,10 +421,23 @@ jobs:
 
       # Alien tests
       - name: Test Alien
-        continue-on-error: true
         id: test-alien
         if: |
-          steps.install-alien.outcome == 'success'
+          steps.install-alien.outcome == 'success' &&
+          (steps.configure-dependencies.outcome == 'success' || steps.configure-dependencies.outcome == 'failure') &&
+          (steps.build-dependencies.outcome == 'success' || steps.build-dependencies.outcome == 'failure') &&
+          (steps.install-dependencies.outcome == 'success' || steps.install-dependencies.outcome == 'failure') &&
+          (steps.configure-axlstar.outcome == 'success' || steps.configure-axlstar.outcome == 'failure') &&
+          (steps.build-axlstar.outcome == 'success' || steps.build-axlstar.outcome == 'failure') &&
+          (steps.install-axlstar.outcome == 'success' || steps.install-axlstar.outcome == 'failure') &&
+          ((matrix.config.with_arcane == '1' && (steps.configure-arcane.outcome == 'success' || steps.configure-arcane.outcome == 'failure')) &&
+          ((matrix.config.with_arcane == '1' && (steps.build-arcane.outcome == 'success' || steps.build-arcane.outcome == 'failure')) &&
+          ((matrix.config.with_arcane == '1' && (steps.install-arcane.outcome == 'success' || steps.install-arcane.outcome == 'failure')) &&
+          (steps.configure-alienlegacyplugins.outcome == 'success' || steps.configure-alienlegacyplugins.outcome == 'failure') &&
+          (steps.build-alienlegacyplugins.outcome == 'success' || steps.build-alienlegacyplugins.outcome == 'failure') &&
+          (steps.install-alienlegacyplugins.outcome == 'success' || steps.install-alienlegacyplugins.outcome == 'failure') &&
+          (steps.test-arccore.outcome == 'success' || steps.test-arccore.outcome == 'failure') &&
+          ((matrix.config.with_arcane == '1' && (steps.install-alienlegacyplugins.outcome == 'success' || steps.install-alienlegacyplugins.outcome == 'failure')) &&
         shell: bash
         run: ctest --test-dir ${{ env.ALIEN_BUILD_DIR }} ${{ env.CT_OPTS }}
       - name: Upload test Alien artifact
@@ -403,10 +451,14 @@ jobs:
 
       # AlienLegacyPlugins tests
       - name: Test AlienLegacyPlugins
-        continue-on-error: true
         id: test-alienlegacyplugins
         if: |
           steps.install-alienlegacyplugins.outcome == 'success'
+          ((matrix.config.with_arcane == '1' && (steps.configure-arcane.outcome == 'success' || steps.configure-arcane.outcome == 'failure')) &&
+          ((matrix.config.with_arcane == '1' && (steps.build-arcane.outcome == 'success' || steps.build-arcane.outcome == 'failure')) &&
+          ((matrix.config.with_arcane == '1' && (steps.install-arcane.outcome == 'success' || steps.install-arcane.outcome == 'failure')) &&
+          (steps.test-arccore.outcome == 'success' || steps.test-arccore.outcome == 'failure') &&
+          ((matrix.config.with_arcane == '1' && (steps.install-alienlegacyplugins.outcome == 'success' || steps.install-alienlegacyplugins.outcome == 'failure')) &&
         shell: bash
         run: ctest --test-dir ${{ env.ALIENLEGACYPLUGINS_BUILD_DIR }} ${{ env.CT_OPTS }} -E '^(alien.interface.c.seq.mpi-1|alien.interface.fortran.seq.mpi-1)$'
       - name: Upload test AlienLegacyPlugins artifact
@@ -417,44 +469,3 @@ jobs:
           name: alienlegacyplugins-test-artifact
           path: ${{ env.ALIENLEGACYPLUGINS_BUILD_DIR }}/Testing
           retention-days: 1
-
-      - name: Check errors
-        id: check_errors
-        if: always()
-        shell: bash
-        run: |
-          result=0
-          # Arccon
-          if [ "${{ steps.configure-arccon.outcome }}" == "failure" ]; then echo "Step 'Configure Arccon' failed !"; result=1; fi
-          if [ "${{ steps.build-arccon.outcome }}" == "failure" ]; then echo "Step 'Build Arccon' failed !"; result=1; fi
-          if [ "${{ steps.install-arccon.outcome }}" == "failure" ]; then echo "Step 'Install Arccon' failed !"; result=1; fi
-          # Dependencies
-          if [ "${{ steps.configure-dependencies.outcome }}" == "failure" ]; then echo "Step 'Configure Dependencies' failed !"; result=1; fi
-          if [ "${{ steps.build-dependencies.outcome }}" == "failure" ]; then echo "Step 'Build Dependencies' failed !"; result=1; fi
-          if [ "${{ steps.install-dependencies.outcome }}" == "failure" ]; then echo "Step 'Install Dependencies' failed !"; result=1; fi
-          # Axlstar
-          if [ "${{ steps.configure-axlstar.outcome }}" == "failure" ]; then echo "Step 'Configure Axlstar' failed !"; result=1; fi
-          if [ "${{ steps.build-axlstar.outcome }}" == "failure" ]; then echo "Step 'Build Axlstar' failed !"; result=1; fi
-          if [ "${{ steps.install-axlstar.outcome }}" == "failure" ]; then echo "Step 'Install Axlstar' failed !"; result=1; fi
-          # Arccore
-          if [ "${{ steps.configure-arccore.outcome }}" == "failure" ]; then echo "Step 'Configure Arccore' failed !"; result=1; fi
-          if [ "${{ steps.build-arccore.outcome }}" == "failure" ]; then echo "Step 'Build Arccore' failed !"; result=1; fi
-          if [ "${{ steps.install-arccore.outcome }}" == "failure" ]; then echo "Step 'Install Arccore' failed !"; result=1; fi
-          if [ "${{ steps.test-arccore.outcome }}" == "failure" ]; then echo "Step 'Test Arccore' failed !"; result=1; fi
-          # Arcane
-          if [ "${{ matrix.config.with_arcane }}" == "1" ] && [ "${{ steps.configure-arcane.outcome }}" == "failure" ]; then echo "Step 'Configure Arcane' failed !"; result=1; fi
-          if [ "${{ matrix.config.with_arcane }}" == "1" ] && [ "${{ steps.build-arcane.outcome }}" == "failure" ]; then echo "Step 'Build Arcane' failed !"; result=1; fi
-          if [ "${{ matrix.config.with_arcane }}" == "1" ] && [ "${{ steps.install-arcane.outcome }}" == "failure" ]; then echo "Step 'Install Arcane' failed !"; result=1; fi
-          if [ "${{ matrix.config.with_arcane }}" == "1" ] && [ "${{ steps.test-arcane.outcome }}" == "failure" ]; then echo "Step 'Test Arcane' failed !"; result=1; fi
-          # Alien
-          if [ "${{ steps.configure-alien.outcome }}" == "failure" ]; then echo "Step 'Configure Alien' failed !"; result=1; fi
-          if [ "${{ steps.build-alien.outcome }}" == "failure" ]; then echo "Step 'Build Alien' failed !"; result=1; fi
-          if [ "${{ steps.install-alien.outcome }}" == "failure" ]; then echo "Step 'Install Alien' failed !"; result=1; fi
-          if [ "${{ steps.test-alien.outcome }}" == "failure" ]; then echo "Step 'Test Alien' failed !"; result=1; fi
-          # AlienLegacyPlugins
-          if [ "${{ steps.configure-alienlegacyplugins.outcome }}" == "failure" ]; then echo "Step 'Configure AlienLegacyPlugins' failed !"; result=1; fi
-          if [ "${{ steps.build-alienlegacyplugins.outcome }}" == "failure" ]; then echo "Step 'Build AlienLegacyPlugins' failed !"; result=1; fi
-          if [ "${{ steps.install-alienlegacyplugins.outcome }}" == "failure" ]; then echo "Step 'Install AlienLegacyPlugins' failed !"; result=1; fi
-          if [ "${{ steps.test-alienlegacyplugins.outcome }}" == "failure" ]; then echo "Step 'Test AlienLegacyPlugins' failed !"; result=1; fi
-          # Exit
-          exit ${result}
