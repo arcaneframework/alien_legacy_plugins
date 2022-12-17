@@ -111,7 +111,7 @@ jobs:
         run: cmake --install ${{ env.ARCCON_BUILD_DIR }}
 
       # Dependencies installation
-      - name: Checkout
+      - name: Checkout Dependencies
         if: always()
         uses: actions/checkout@v3
         with:
@@ -174,7 +174,7 @@ jobs:
         run: cmake --install ${{ env.ARCCORE_BUILD_DIR }}
 
       # Arcane installation
-      - name: Checkout
+      - name: Checkout Arcane
         if: always()
         uses: actions/checkout@v3
         with:
@@ -195,7 +195,7 @@ jobs:
         run: cmake --install ${{ env.ARCANE_BUILD_DIR }}
 
       # Alien installation
-      - name: Checkout
+      - name: Checkout Alien
         if: always()
         uses: actions/checkout@v3
         with:
