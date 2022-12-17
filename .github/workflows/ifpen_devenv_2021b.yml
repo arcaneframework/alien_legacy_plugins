@@ -124,7 +124,7 @@ jobs:
       - name: Configure Arccon
         if: always()
         shell: bash
-        run: echo ${{ matrix.with_arcane}} ; cmake -S ${{ env.ARCCON_SOURCE_DIR }}/arccon -B ${{ env.ARCCON_BUILD_DIR }} -DCMAKE_BUILD_TYPE=${{ env.CM_BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=${{ env.ARCCON_INSTALL_DIR }}
+        run: cmake -S ${{ env.ARCCON_SOURCE_DIR }}/arccon -B ${{ env.ARCCON_BUILD_DIR }} -DCMAKE_BUILD_TYPE=${{ env.CM_BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=${{ env.ARCCON_INSTALL_DIR }}
       - name: Build Arccon
         if: always()
         shell: bash
@@ -199,22 +199,22 @@ jobs:
 
       # Arcane installation
       - name: Checkout Arcane
-        if: ${{ matrix.with_arcane == '1' }}
+        if: ${{ matrix.config.with_arcane == '1' }}
         uses: actions/checkout@v3
         with:
           repository: arcaneframework/framework
           path: ${{ env.ARCANE_SOURCE_DIR }}
           ref: main
       - name: Configure Arcane
-        if: ${{ matrix.with_arcane == '1' }}
+        if: ${{ matrix.config.with_arcane == '1' }}
         shell: bash
         run: cmake -S ${{ env.ARCANE_SOURCE_DIR }}/arcane -B ${{ env.ARCANE_BUILD_DIR }} -DCMAKE_BUILD_TYPE=${{ env.CM_BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=${{ env.ARCANE_INSTALL_DIR }} -DArccon_ROOT=${{ env.ARCCON_INSTALL_DIR }} -DArccore_DIR=${{ env.ARCCORE_INSTALL_DIR }}/lib/cmake/Arccore -DAxlstar_DIR=${{ env.AXLSTAR_INSTALL_DIR }}/share/cmake/Axlstar -DArcDependencies_ROOT=${{ env.DEPENDENCIES_INSTALL_DIR }} -DBUILD_SHARED_LIBS=ON -DARCANE_DEFAULT_PARTITIONER=Metis -DARCANE_WANT_TOTALVIEW=ON -DARCANE_WANT_LIBXML2=ON -DARCANE_WANT_LEGACY_CONNECTIVITY=OFF -DARCANE_WANT_CHECK=OFF -DARCANE_WANT_ARCCON_EXPORT_TARGET=OFF -DARCANE_DISABLE_PERFCOUNTER_TESTS=ON ${{ env.CM_CCACHE_OPTS }}
       - name: Build Arcane
-        if: ${{ matrix.with_arcane == '1' }}
+        if: ${{ matrix.config.with_arcane == '1' }}
         shell: bash
         run: cmake --build ${{ env.ARCANE_BUILD_DIR }} ${{ env.CM_BUILD_OPTS }}
       - name: Install Arcane
-        if: ${{ matrix.with_arcane == '1' }}
+        if: ${{ matrix.config.with_arcane == '1' }}
         shell: bash
         run: cmake --install ${{ env.ARCANE_BUILD_DIR }}
 
@@ -274,7 +274,7 @@ jobs:
 
       # Arcane tests
       - name: Test Arcane
-        if: ${{ matrix.with_arcane == '1' }}
+        if: ${{ matrix.config.with_arcane == '1' }}
         shell: bash
         run: ctest --test-dir ${{ env.ARCANE_BUILD_DIR }} ${{ env.CT_OPTS }} -E '^hydro5_4proc_3sd_4proc$'
       - name: Upload test Arcane artifact
