@@ -103,7 +103,6 @@ jobs:
       - name: Get date
         id: get-date
         if: always()
-        id: get-date
         shell: bash
         run: echo "NOW=$(/bin/date -u '+%Y%m%d%H%M%S')" >> $GITHUB_ENV
       - name: Get cache
