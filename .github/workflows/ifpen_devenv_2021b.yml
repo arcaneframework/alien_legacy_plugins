@@ -381,9 +381,7 @@ jobs:
           ((matrix.config.with_arcane == '1' && (steps.install-arcane.outcome == 'success' || steps.install-arcane.outcome == 'failure')) &&
           (steps.configure-alienlegacyplugins.outcome == 'success' || steps.configure-alienlegacyplugins.outcome == 'failure') &&
           (steps.build-alienlegacyplugins.outcome == 'success' || steps.build-alienlegacyplugins.outcome == 'failure') &&
-          ((matrix.config.with_arcane == '1' && (steps.install-alienlegacyplugins.outcome == 'success' || steps.install-alienlegacyplugins.outcome == 'failure')) &&
-
-
+          ((matrix.config.with_arcane == '1' && (steps.install-alienlegacyplugins.outcome == 'success' || steps.install-alienlegacyplugins.outcome == 'failure'))
         shell: bash
         run: ctest --test-dir ${{ env.ARCCORE_BUILD_DIR }} ${{ env.CT_OPTS }}
       - name: Upload test Arccore artifact
@@ -407,7 +405,7 @@ jobs:
           (steps.configure-alienlegacyplugins.outcome == 'success' || steps.configure-alienlegacyplugins.outcome == 'failure') &&
           (steps.build-alienlegacyplugins.outcome == 'success' || steps.build-alienlegacyplugins.outcome == 'failure') &&
           (steps.install-alienlegacyplugins.outcome == 'success' || steps.install-alienlegacyplugins.outcome == 'failure') &&
-          (steps.test-arccore.outcome == 'success' || steps.test-arccore.outcome == 'failure') &&
+          (steps.test-arccore.outcome == 'success' || steps.test-arccore.outcome == 'failure')
         shell: bash
         run: ctest --test-dir ${{ env.ARCANE_BUILD_DIR }} ${{ env.CT_OPTS }} -E '^hydro5_4proc_3sd_4proc$'
       - name: Upload test Arcane artifact
@@ -437,7 +435,7 @@ jobs:
           (steps.build-alienlegacyplugins.outcome == 'success' || steps.build-alienlegacyplugins.outcome == 'failure') &&
           (steps.install-alienlegacyplugins.outcome == 'success' || steps.install-alienlegacyplugins.outcome == 'failure') &&
           (steps.test-arccore.outcome == 'success' || steps.test-arccore.outcome == 'failure') &&
-          ((matrix.config.with_arcane == '1' && (steps.install-alienlegacyplugins.outcome == 'success' || steps.install-alienlegacyplugins.outcome == 'failure')) &&
+          ((matrix.config.with_arcane == '1' && (steps.install-alienlegacyplugins.outcome == 'success' || steps.install-alienlegacyplugins.outcome == 'failure'))
         shell: bash
         run: ctest --test-dir ${{ env.ALIEN_BUILD_DIR }} ${{ env.CT_OPTS }}
       - name: Upload test Alien artifact
@@ -458,7 +456,7 @@ jobs:
           ((matrix.config.with_arcane == '1' && (steps.build-arcane.outcome == 'success' || steps.build-arcane.outcome == 'failure')) &&
           ((matrix.config.with_arcane == '1' && (steps.install-arcane.outcome == 'success' || steps.install-arcane.outcome == 'failure')) &&
           (steps.test-arccore.outcome == 'success' || steps.test-arccore.outcome == 'failure') &&
-          ((matrix.config.with_arcane == '1' && (steps.install-alienlegacyplugins.outcome == 'success' || steps.install-alienlegacyplugins.outcome == 'failure')) &&
+          ((matrix.config.with_arcane == '1' && (steps.install-alienlegacyplugins.outcome == 'success' || steps.install-alienlegacyplugins.outcome == 'failure'))
         shell: bash
         run: ctest --test-dir ${{ env.ALIENLEGACYPLUGINS_BUILD_DIR }} ${{ env.CT_OPTS }} -E '^(alien.interface.c.seq.mpi-1|alien.interface.fortran.seq.mpi-1)$'
       - name: Upload test AlienLegacyPlugins artifact
