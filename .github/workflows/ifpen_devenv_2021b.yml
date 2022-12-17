@@ -369,7 +369,7 @@ jobs:
       - name: Test Arccore
         id: test-arccore
         if: |
-          steps.install-arccore.outcome == 'success'
+          steps.install-arccore.outcome == 'success' &&
           (steps.configure-dependencies.outcome == 'success' || steps.configure-dependencies.outcome == 'failure') &&
           (steps.build-dependencies.outcome == 'success' || steps.build-dependencies.outcome == 'failure') &&
           (steps.install-dependencies.outcome == 'success' || steps.install-dependencies.outcome == 'failure') &&
@@ -453,7 +453,7 @@ jobs:
       - name: Test AlienLegacyPlugins
         id: test-alienlegacyplugins
         if: |
-          steps.install-alienlegacyplugins.outcome == 'success'
+          steps.install-alienlegacyplugins.outcome == 'success' &&
           ((matrix.config.with_arcane == '1' && (steps.configure-arcane.outcome == 'success' || steps.configure-arcane.outcome == 'failure')) &&
           ((matrix.config.with_arcane == '1' && (steps.build-arcane.outcome == 'success' || steps.build-arcane.outcome == 'failure')) &&
           ((matrix.config.with_arcane == '1' && (steps.install-arcane.outcome == 'success' || steps.install-arcane.outcome == 'failure')) &&
