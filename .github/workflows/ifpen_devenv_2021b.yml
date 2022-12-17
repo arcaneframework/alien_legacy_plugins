@@ -132,7 +132,7 @@ jobs:
       - name: Build Arccon
         id: build-arccon
         if: |
-          (success() || failure()) &&
+          (success() || failure())
         shell: bash
         run: cmake --build ${{ env.ARCCON_BUILD_DIR }} ${{ env.CM_BUILD_OPTS }}
       - name: Install Arccon
