@@ -116,7 +116,6 @@ jobs:
 
       # Arccon installation
       - name: Checkout Arccon
-        continue-on-error: true
         id: checkout-arccon
         if: always()
         uses: actions/checkout@v3
@@ -148,7 +147,6 @@ jobs:
 
       # Dependencies installation
       - name: Checkout Dependencies
-        continue-on-error: true
         id: checkout-dependencies
         if: |
           steps.install-arccon.outcome == 'success'
@@ -181,7 +179,6 @@ jobs:
 
       # Axlstar installation
       - name: Checkout axlstar
-        continue-on-error: true
         id: checkout-axlstar
         if: |
           steps.install-arccon.outcome == 'success' &&
@@ -215,7 +212,6 @@ jobs:
 
       # Arccore installation
       - name: Checkout Arccore
-        continue-on-error: true
         id: checkout-arccore
         if: |
           steps.install-arccon.outcome == 'success'
@@ -248,7 +244,6 @@ jobs:
 
       # Arcane installation
       - name: Checkout Arcane
-        continue-on-error: true
         id: checkout-arcane
         if: |
           matrix.config.with_arcane == '1' &&
@@ -288,7 +283,6 @@ jobs:
 
       # Alien installation
       - name: Checkout Alien
-        continue-on-error: true
         id: checkout-alien
         if: |
           steps.install-arccon.outcome == 'success' &&
@@ -322,7 +316,6 @@ jobs:
 
       # AlienLegacyPlugins installation
       - name: Checkout AlienLegacyPlugins
-        continue-on-error: true
         id: checkout-alienlegacyplugins
         if: |
           steps.install-arccon.outcome == 'success' &&
@@ -424,3 +417,44 @@ jobs:
           name: alienlegacyplugins-test-artifact
           path: ${{ env.ALIENLEGACYPLUGINS_BUILD_DIR }}/Testing
           retention-days: 1
+
+      - name: Check errors
+        id: check_errors
+        if: always()
+        shell: bash
+        run: |
+          result=0
+          # Arccon
+          if [ "${{ steps.configure-arccon.outcome }}" == "failure" ]; then echo "Step 'Configure Arccon' failed !"; result=1; fi
+          if [ "${{ steps.build-arccon.outcome }}" == "failure" ]; then echo "Step 'Build Arccon' failed !"; result=1; fi
+          if [ "${{ steps.install-arccon.outcome }}" == "failure" ]; then echo "Step 'Install Arccon' failed !"; result=1; fi
+          # Dependencies
+          if [ "${{ steps.configure-dependencies.outcome }}" == "failure" ]; then echo "Step 'Configure Dependencies' failed !"; result=1; fi
+          if [ "${{ steps.build-dependencies.outcome }}" == "failure" ]; then echo "Step 'Build Dependencies' failed !"; result=1; fi
+          if [ "${{ steps.install-dependencies.outcome }}" == "failure" ]; then echo "Step 'Install Dependencies' failed !"; result=1; fi
+          # Axlstar
+          if [ "${{ steps.configure-axlstar.outcome }}" == "failure" ]; then echo "Step 'Configure Axlstar' failed !"; result=1; fi
+          if [ "${{ steps.build-axlstar.outcome }}" == "failure" ]; then echo "Step 'Build Axlstar' failed !"; result=1; fi
+          if [ "${{ steps.install-axlstar.outcome }}" == "failure" ]; then echo "Step 'Install Axlstar' failed !"; result=1; fi
+          # Arccore
+          if [ "${{ steps.configure-arccore.outcome }}" == "failure" ]; then echo "Step 'Configure Arccore' failed !"; result=1; fi
+          if [ "${{ steps.build-arccore.outcome }}" == "failure" ]; then echo "Step 'Build Arccore' failed !"; result=1; fi
+          if [ "${{ steps.install-arccore.outcome }}" == "failure" ]; then echo "Step 'Install Arccore' failed !"; result=1; fi
+          if [ "${{ steps.test-arccore.outcome }}" == "failure" ]; then echo "Step 'Test Arccore' failed !"; result=1; fi
+          # Arcane
+          if [ "${{ matrix.config.with_arcane }}" == "1" ] && [ "${{ steps.configure-arcane.outcome }}" == "failure" ]; then echo "Step 'Configure Arcane' failed !"; result=1; fi
+          if [ "${{ matrix.config.with_arcane }}" == "1" ] && [ "${{ steps.build-arcane.outcome }}" == "failure" ]; then echo "Step 'Build Arcane' failed !"; result=1; fi
+          if [ "${{ matrix.config.with_arcane }}" == "1" ] && [ "${{ steps.install-arcane.outcome }}" == "failure" ]; then echo "Step 'Install Arcane' failed !"; result=1; fi
+          if [ "${{ matrix.config.with_arcane }}" == "1" ] && [ "${{ steps.test-arcane.outcome }}" == "failure" ]; then echo "Step 'Test Arcane' failed !"; result=1; fi
+          # Alien
+          if [ "${{ steps.configure-alien.outcome }}" == "failure" ]; then echo "Step 'Configure Alien' failed !"; result=1; fi
+          if [ "${{ steps.build-alien.outcome }}" == "failure" ]; then echo "Step 'Build Alien' failed !"; result=1; fi
+          if [ "${{ steps.install-alien.outcome }}" == "failure" ]; then echo "Step 'Install Alien' failed !"; result=1; fi
+          if [ "${{ steps.test-alien.outcome }}" == "failure" ]; then echo "Step 'Test Alien' failed !"; result=1; fi
+          # AlienLegacyPlugins
+          if [ "${{ steps.configure-alienlegacyplugins.outcome }}" == "failure" ]; then echo "Step 'Configure AlienLegacyPlugins' failed !"; result=1; fi
+          if [ "${{ steps.build-alienlegacyplugins.outcome }}" == "failure" ]; then echo "Step 'Build AlienLegacyPlugins' failed !"; result=1; fi
+          if [ "${{ steps.install-alienlegacyplugins.outcome }}" == "failure" ]; then echo "Step 'Install AlienLegacyPlugins' failed !"; result=1; fi
+          if [ "${{ steps.test-alienlegacyplugins.outcome }}" == "failure" ]; then echo "Step 'Test AlienLegacyPlugins' failed !"; result=1; fi
+          # Exit
+          exit ${result}
