@@ -8,10 +8,10 @@ env:
   ALIEN_BUILD_DIR: /__w/alien_legacy_plugins/alien_legacy_plugins/alien_build
   ALIEN_INSTALL_DIR: /__w/alien_legacy_plugins/alien_legacy_plugins/alien_install
   ALIEN_SOURCE_DIR: /__w/alien_legacy_plugins/alien_legacy_plugins/alien
-  # AlienLegacy
-  ALIENLEGACY_BUILD_DIR: /__w/alien_legacy_plugins/alien_legacy_plugins/alienlegacy_build
-  ALIENLEGACY_INSTALL_DIR: /__w/alien_legacy_plugins/alien_legacy_plugins/alienlegacy_install
-  ALIENLEGACY_SOURCE_DIR: /__w/alien_legacy_plugins/alien_legacy_plugins/alienlegacy
+  # AlienLegacyPlugins
+  ALIENLEGACYPLUGINS_BUILD_DIR: /__w/alien_legacy_plugins/alien_legacy_plugins/alienlegacyplugins_build
+  ALIENLEGACYPLUGINS_INSTALL_DIR: /__w/alien_legacy_plugins/alien_legacy_plugins/alienlegacyplugins_install
+  ALIENLEGACYPLUGINS_SOURCE_DIR: /__w/alien_legacy_plugins/alien_legacy_plugins/alienlegacyplugins
   # Arcane
   ARCANE_BUILD_DIR: /__w/alien_legacy_plugins/alien_legacy_plugins/arcane_build
   ARCANE_INSTALL_DIR: /__w/alien_legacy_plugins/alien_legacy_plugins/arcane_install
@@ -49,7 +49,7 @@ jobs:
   build :
     name: ${{matrix.config.name}}
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 120
     container:
       image: ${{matrix.config.container}}
       #options: --user root  # Avoid to match github UID in container.
@@ -58,151 +58,202 @@ jobs:
       matrix:
         config:
           - {
+            name: "el7 foss/2021b",
+            container: "ghcr.io/cedricga91/arcane-ifpen-devenv-foss-2021b:el7",
+          }
+          - {
+            name: "el8 foss/2021b",
+            container: "ghcr.io/cedricga91/arcane-ifpen-devenv-foss-2021b:el8",
+          }
+          - {
             name: "el7 gimkl/2021b",
             container: "ghcr.io/cedricga91/arcane-ifpen-devenv-gimkl-2021b:el7",
+          }
+          - {
+            name: "el8 gimkl/2021b",
+            container: "ghcr.io/cedricga91/arcane-ifpen-devenv-gimkl-2021b:el8",
           }
     steps:
 
       # ccache
       - name: Get date
+        if: always()
         id: get-date
         shell: bash
         run: echo "NOW=$(/bin/date -u '+%Y%m%d%H%M%S')" >> $GITHUB_ENV
       - name: Get cache
+        if: always()
         uses: actions/cache@v3
         with:
           path: ${{env.CCACHE_DIR}}
           key: ${{ env.CC_KEY_PREFIX }}-${{ env.CM_BUILD_TYPE }}-${{ env.NOW }}-${{ github.run_number }}
           restore-keys: ${{ env.CC_KEY_PREFIX }}-arccore-${{ env.CM_BUILD_TYPE }}-
 
-      # Arccon
+      # Arccon installation
       - name: Checkout Arccon
+        if: always()
         uses: actions/checkout@v3
         with:
           repository: arcaneframework/framework
           path: ${{ env.ARCCON_SOURCE_DIR }}
           ref: main
       - name: Configure Arccon
+        if: always()
         shell: bash
         run: cmake -S ${{ env.ARCCON_SOURCE_DIR }}/arccon -B ${{ env.ARCCON_BUILD_DIR }} -DCMAKE_BUILD_TYPE=${{ env.CM_BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=${{ env.ARCCON_INSTALL_DIR }}
       - name: Build Arccon
+        if: always()
         shell: bash
         run: cmake --build ${{ env.ARCCON_BUILD_DIR }} ${{ env.CM_BUILD_OPTS }}
       - name: Install Arccon
+        if: always()
         shell: bash
         run: cmake --install ${{ env.ARCCON_BUILD_DIR }}
 
-      # Arccore
-      - name: Checkout Arccore
-        uses: actions/checkout@v3
-        with:
-          repository: arcaneframework/framework
-          path: ${{ env.ARCCORE_SOURCE_DIR }}
-          ref: main
-      - name: Configure Arccore
-        shell: bash
-        run: cmake -S ${{ env.ARCCORE_SOURCE_DIR }}/arccore -B ${{ env.ARCCORE_BUILD_DIR }} -DCMAKE_BUILD_TYPE=${{ env.CM_BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=${{ env.ARCCORE_INSTALL_DIR }} -DArccon_ROOT=${{ env.ARCCON_INSTALL_DIR }} -DBUILD_SHARED_LIBS=ON ${{ env.CM_CCACHE_OPTS }}
-      - name: Build Arccore
-        shell: bash
-        run: cmake --build ${{ env.ARCCORE_BUILD_DIR }} ${{ env.CM_BUILD_OPTS }}
-      - name: Install Arccore
-        shell: bash
-        run: cmake --install ${{ env.ARCCORE_BUILD_DIR }}
-
-      # Dependencies
+      # Dependencies installation
       - name: Checkout
+        if: always()
         uses: actions/checkout@v3
         with:
           repository: arcaneframework/dependencies
           path: ${{ env.DEPENDENCIES_SOURCE_DIR }}
           ref: main
       - name: Configure Dependencies
+        if: always()
         shell: bash
         run: cmake -S ${{ env.DEPENDENCIES_SOURCE_DIR }} -B ${{ env.DEPENDENCIES_BUILD_DIR }} -DCMAKE_BUILD_TYPE=${{ env.CM_BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=${{ env.DEPENDENCIES_INSTALL_DIR }} -DArccon_ROOT=${{ env.ARCCON_INSTALL_DIR }}
       - name: Build Dependencies
+        if: always()
         shell: bash
         run: cmake --build ${{ env.DEPENDENCIES_BUILD_DIR }} ${{ env.CM_BUILD_OPTS }}
       - name: Install Dependencies
+        if: always()
         shell: bash
         run: cmake --install ${{ env.DEPENDENCIES_BUILD_DIR }}
 
-      # Axlstar
+      # Axlstar installation
       - name: Checkout axlstar
+        if: always()
         uses: actions/checkout@v3
         with:
           repository: arcaneframework/framework
           path: ${{ env.AXLSTAR_SOURCE_DIR }}
           ref: main
       - name: Configure Axlstar
+        if: always()
         shell: bash
         run: cmake -S ${{ env.AXLSTAR_SOURCE_DIR }}/axlstar -B ${{ env.AXLSTAR_BUILD_DIR }} -DCMAKE_BUILD_TYPE=${{ env.CM_BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=${{ env.AXLSTAR_INSTALL_DIR }} -DArccon_ROOT=${{ env.ARCCON_INSTALL_DIR }} -DArcDependencies_ROOT=${{ env.DEPENDENCIES_INSTALL_DIR }}
       - name: Build Axlstar
+        if: always()
         shell: bash
         run: cmake --build ${{ env.AXLSTAR_BUILD_DIR }} ${{ env.CM_BUILD_OPTS }}
       - name: Install Axlstar
+        if: always()
         shell: bash
         run: cmake --install ${{ env.AXLSTAR_BUILD_DIR }}
 
-      # Arcane
+      # Arccore installation
+      - name: Checkout Arccore
+        if: always()
+        uses: actions/checkout@v3
+        with:
+          repository: arcaneframework/framework
+          path: ${{ env.ARCCORE_SOURCE_DIR }}
+          ref: main
+      - name: Configure Arccore
+        if: always()
+        shell: bash
+        run: cmake -S ${{ env.ARCCORE_SOURCE_DIR }}/arccore -B ${{ env.ARCCORE_BUILD_DIR }} -DCMAKE_BUILD_TYPE=${{ env.CM_BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=${{ env.ARCCORE_INSTALL_DIR }} -DArccon_ROOT=${{ env.ARCCON_INSTALL_DIR }} -DBUILD_SHARED_LIBS=ON ${{ env.CM_CCACHE_OPTS }}
+      - name: Build Arccore
+        if: always()
+        shell: bash
+        run: cmake --build ${{ env.ARCCORE_BUILD_DIR }} ${{ env.CM_BUILD_OPTS }}
+      - name: Install Arccore
+        if: always()
+        shell: bash
+        run: cmake --install ${{ env.ARCCORE_BUILD_DIR }}
+
+      # Arcane installation
       - name: Checkout
+        if: always()
         uses: actions/checkout@v3
         with:
           repository: arcaneframework/framework
           path: ${{ env.ARCANE_SOURCE_DIR }}
           ref: main
       - name: Configure Arcane
+        if: always()
         shell: bash
         run: cmake -S ${{ env.ARCANE_SOURCE_DIR }}/arcane -B ${{ env.ARCANE_BUILD_DIR }} -DCMAKE_BUILD_TYPE=${{ env.CM_BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=${{ env.ARCANE_INSTALL_DIR }} -DArccon_ROOT=${{ env.ARCCON_INSTALL_DIR }} -DArccore_DIR=${{ env.ARCCORE_INSTALL_DIR }}/lib/cmake/Arccore -DAxlstar_DIR=${{ env.AXLSTAR_INSTALL_DIR }}/share/cmake/Axlstar -DArcDependencies_ROOT=${{ env.DEPENDENCIES_INSTALL_DIR }} -DBUILD_SHARED_LIBS=ON -DARCANE_DEFAULT_PARTITIONER=Metis -DARCANE_WANT_TOTALVIEW=ON -DARCANE_WANT_LIBXML2=ON -DARCANE_WANT_LEGACY_CONNECTIVITY=OFF -DARCANE_WANT_CHECK=OFF -DARCANE_WANT_ARCCON_EXPORT_TARGET=OFF -DARCANE_DISABLE_PERFCOUNTER_TESTS=ON ${{ env.CM_CCACHE_OPTS }}
       - name: Build Arcane
+        if: always()
         shell: bash
         run: cmake --build ${{ env.ARCANE_BUILD_DIR }} ${{ env.CM_BUILD_OPTS }}
       - name: Install Arcane
+        if: always()
         shell: bash
         run: cmake --install ${{ env.ARCANE_BUILD_DIR }}
 
-      # Alien
+      # Alien installation
       - name: Checkout
+        if: always()
         uses: actions/checkout@v3
         with:
           repository: arcaneframework/alien
           path: ${{ env.ALIEN_SOURCE_DIR }}
           ref: main
       - name: Configure Alien
+        if: always()
         shell: bash
         run: cmake -S ${{ env.ALIEN_SOURCE_DIR }} -B ${{ env.ALIEN_BUILD_DIR }} -DCMAKE_BUILD_TYPE=${{ env.CM_BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=${{ env.ALIEN_INSTALL_DIR }} -DALIENDEV_EMBEDDED=OFF -DArccon_ROOT=${{ env.ARCCON_INSTALL_DIR }} -DArccore_DIR=${{ env.ARCCORE_INSTALL_DIR }}/lib/cmake/Arccore -DCMAKE_FIND_DEBUG_MODE=1 -DVerbose=ON -DBoost_NO_BOOST_CMAKE=ON -DBUILD_SHARED_LIBS=ON -DALIEN_USE_HDF5=ON ${{ env.CM_CCACHE_OPTS }}
       - name: Build Alien
+        if: always()
         shell: bash
         run: cmake --build ${{ env.ALIEN_BUILD_DIR }} ${{ env.CM_BUILD_OPTS }}
       - name: Install Alien
+        if: always()
         shell: bash
         run: cmake --install ${{ env.ALIEN_BUILD_DIR }}
 
-      # AlienLegacyPlugins
+      # AlienLegacyPlugins installation
       - name: Checkout AlienLegacyPlugins
+        if: always()
         uses: actions/checkout@v3
         with:
-          path: ${{ env.ALIENLEGACY_SOURCE_DIR }}
+          path: ${{ env.ALIENLEGACYPLUGINS_SOURCE_DIR }}
           submodules: true
       - name: Configure AlienLegacyPlugins
+        if: always()
         shell: bash
-        run: cmake -S ${{ env.ALIENLEGACY_SOURCE_DIR }} -B ${{ env.ALIENLEGACY_BUILD_DIR }} -DCMAKE_BUILD_TYPE=${{ env.CM_BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=${{ env.ALIENLEGACY_INSTALL_DIR }} -DBUILD_SHARED_LIBS=ON -DArccon_ROOT=${{ env.ARCCON_INSTALL_DIR }} -DArccore_ROOT=${{ env.ARCCORE_INSTALL_DIR }} -DAxlstar_ROOT=${{ env.AXLSTAR_INSTALL_DIR }} -DArcane_ROOT=${{ env.ARCANE_INSTALL_DIR }} -DAlien_ROOT=${{ env.ALIEN_INSTALL_DIR }} -DUSE_BUILDSYSTEM_GIT_SUBMODULE=ON ${{ env.CM_CCACHE_OPTS }}
+        run: cmake -S ${{ env.ALIENLEGACYPLUGINS_SOURCE_DIR }} -B ${{ env.ALIENLEGACYPLUGINS_BUILD_DIR }} -DCMAKE_BUILD_TYPE=${{ env.CM_BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=${{ env.ALIENLEGACYPLUGINS_INSTALL_DIR }} -DBUILD_SHARED_LIBS=ON -DArccon_ROOT=${{ env.ARCCON_INSTALL_DIR }} -DArccore_ROOT=${{ env.ARCCORE_INSTALL_DIR }} -DAxlstar_ROOT=${{ env.AXLSTAR_INSTALL_DIR }} -DArcane_ROOT=${{ env.ARCANE_INSTALL_DIR }} -DAlien_ROOT=${{ env.ALIEN_INSTALL_DIR }} -DUSE_BUILDSYSTEM_GIT_SUBMODULE=ON ${{ env.CM_CCACHE_OPTS }}
       - name: Build AlienLegacyPlugins
+        if: always()
         shell: bash
-        run: cmake --build ${{ env.ALIENLEGACY_BUILD_DIR }} ${{ env.CM_BUILD_OPTS }}
+        run: cmake --build ${{ env.ALIENLEGACYPLUGINS_BUILD_DIR }} ${{ env.CM_BUILD_OPTS }}
       - name: Install AlienLegacyPlugins
+        if: always()
         shell: bash
-        run: cmake --install ${{ env.ALIENLEGACY_BUILD_DIR }}
+        run: cmake --install ${{ env.ALIENLEGACYPLUGINS_BUILD_DIR }}
 
       # Arccore tests
       - name: Test Arccore
+        if: always()
         shell: bash
         run: ctest --test-dir ${{ env.ARCCORE_BUILD_DIR }} ${{ env.CT_OPTS }}
+      - name: Upload test Arccore artifact
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: arccore-test-artifact
+          path: ${{ env.ARCCORE_BUILD_DIR }}/Testing
+          retention-days: 1
 
       # Arcane tests
       - name: Test Arcane
+        if: always()
         shell: bash
         run: ctest --test-dir ${{ env.ARCANE_BUILD_DIR }} ${{ env.CT_OPTS }} -E '^hydro5_4proc_3sd_4proc$'
-      - name: Upload test artifact
+      - name: Upload test Arcane artifact
         uses: actions/upload-artifact@v3
         if: failure()
         with:
@@ -212,9 +263,10 @@ jobs:
 
       # Alien tests
       - name: Test Alien
+        if: always()
         shell: bash
         run: ctest --test-dir ${{ env.ALIEN_BUILD_DIR }} ${{ env.CT_OPTS }}
-      - name: Upload test artifact
+      - name: Upload test Alien artifact
         uses: actions/upload-artifact@v3
         if: failure()
         with:
@@ -224,12 +276,13 @@ jobs:
 
       # AlienLegacyPlugins tests
       - name: Test AlienLegacyPlugins
+        if: always()
         shell: bash
-        run: ctest --test-dir ${{ env.ALIENLEGACY_BUILD_DIR }} ${{ env.CT_OPTS }} -E '^(alien.interface.c.seq.mpi-1|alien.interface.fortran.seq.mpi-1)$'
-      - name: Upload test artifact
+        run: ctest --test-dir ${{ env.ALIENLEGACYPLUGINS_BUILD_DIR }} ${{ env.CT_OPTS }} -E '^(alien.interface.c.seq.mpi-1|alien.interface.fortran.seq.mpi-1)$'
+      - name: Upload test AlienLegacyPlugins artifact
         uses: actions/upload-artifact@v3
         if: failure()
         with:
-          name: alienlegacy-test-artifact
-          path: ${{ env.ALIENLEGACY_BUILD_DIR }}/Testing
+          name: alienlegacyplugins-test-artifact
+          path: ${{ env.ALIENLEGACYPLUGINS_BUILD_DIR }}/Testing
           retention-days: 1
