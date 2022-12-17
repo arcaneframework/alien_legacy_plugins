@@ -128,11 +128,11 @@ jobs:
         if: |
           steps.checkout-arccon.outcome == 'success'
         shell: bash
-        run: cmake -S ${{ env.ARCCON_SOURCE_DIR }}/arccon -B ${{ env.ARCCON_BUILD_DIR }} -DCMAKE_BUILD_TYPE=${{ env.CM_BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=${{ env.ARCCON_INSTALL_DIR }}
+        run: cmake -S ${{ env.ARCCON_SOURCE_DIR }}/arccon -B ${{ env.ARCCON_BUILD_DIR }} -DCMAKE_BUILD_TYPE=${{ env.CM_BUILD_TYPE }} -DCMAKE_INSTALL_PREFIX=${{ env.ARCCON_INSTALL_DIR }} ; exit 1
       - name: Build Arccon
         id: build-arccon
         if: |
-          steps.configure-arccon.outcome == 'success'
+          (success() || failure()) &&
         shell: bash
         run: cmake --build ${{ env.ARCCON_BUILD_DIR }} ${{ env.CM_BUILD_OPTS }}
       - name: Install Arccon
