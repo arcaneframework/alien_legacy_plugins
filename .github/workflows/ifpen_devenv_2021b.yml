@@ -102,12 +102,10 @@ jobs:
       # ccache
       - name: Get date
         id: get-date
-        if: always()
         shell: bash
         run: echo "NOW=$(/bin/date -u '+%Y%m%d%H%M%S')" >> $GITHUB_ENV
       - name: Get cache
         id: get-cache
-        if: always()
         uses: actions/cache@v3
         with:
           path: ${{env.CCACHE_DIR}}
@@ -117,7 +115,6 @@ jobs:
       # Arccon installation
       - name: Checkout Arccon
         id: checkout-arccon
-        if: always()
         uses: actions/checkout@v3
         with:
           repository: arcaneframework/framework
