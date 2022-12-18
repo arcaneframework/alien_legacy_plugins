@@ -365,7 +365,9 @@ jobs:
       - name: Upload test Arccore artifact
         id: upload-test-arccore-artifact
         uses: actions/upload-artifact@v3
-        if: failure()
+        if: |
+          (success() || failure()) &&
+          steps.test-arccore.outcome == 'failure'
         with:
           name: arccore-test-artifact
           path: ${{ env.ARCCORE_BUILD_DIR }}/Testing
@@ -383,7 +385,10 @@ jobs:
       - name: Upload test Arcane artifact
         id: upload-test-arcane-artifact
         uses: actions/upload-artifact@v3
-        if: failure()
+        if: |
+          (success() || failure()) &&
+          matrix.config.with_arcane == '1' &&
+          steps.test-arcane.outcome == 'failure'
         with:
           name: arcane-test-artifact
           path: ${{ env.ARCANE_BUILD_DIR }}/Testing
@@ -400,7 +405,9 @@ jobs:
       - name: Upload test Alien artifact
         id: upload-test-alien-artifact
         uses: actions/upload-artifact@v3
-        if: failure()
+        if:
+          (success() || failure()) &&
+          steps.test-alien.outcome == 'failure'
         with:
           name: alien-test-artifact
           path: ${{ env.ALIEN_BUILD_DIR }}/Testing
@@ -417,7 +424,9 @@ jobs:
       - name: Upload test AlienLegacyPlugins artifact
         id: upload-test-alienlegacyplugins-artifact
         uses: actions/upload-artifact@v3
-        if: failure()
+        if:
+          (success() || failure()) &&
+          steps.test-alienlegacyplugins.outcome == 'failure'
         with:
           name: alienlegacyplugins-test-artifact
           path: ${{ env.ALIENLEGACYPLUGINS_BUILD_DIR }}/Testing
