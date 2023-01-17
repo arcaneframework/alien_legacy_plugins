@@ -1,6 +1,6 @@
 #include <alien/hypre/backend.h>
 
-#include <alien/Alien-MoveSemantic.h>
+#include <alien/ref/AlienRefSemantic.h>
 
 #include <arcane/ITimeLoopMng.h>
 #include <arcane/Timer.h>
@@ -320,7 +320,7 @@ AlienTestModule::test()
           for (Integer loop = 0; loop < options()->repeatLoop(); ++loop) {
             info() << "Filling #" << loop;
             Alien::DirectMatrixBuilder builder(
-                std::move(matrixA), Alien::DirectMatrixOptions::eResetValues);
+                matrixA, Alien::DirectMatrixOptions::eResetValues);
             if (loop == 0) {
               profile_stat.start();
               builder.reserve(indexSetU.getOwnIndexes(), 30);
@@ -342,17 +342,15 @@ AlienTestModule::test()
                 .finalize(); // process extra work after filling (squeeze, non-local...)
             // optional if used with out-of-scope dtor
             inserter_stats.back().stop();
-            matrixA = builder.release();
           }
       } break;
       case AlienTestOptionTypes::ProfiledBuilder: {
         profile_stat.start();
         {
-          Alien::MatrixProfiler profiler(std::move(matrixA));
+          Alien::MatrixProfiler profiler(matrixA);
           profileMatrix(
               cell_cell_connection, areaP, allPIndex, allUIndex, allXIndex, profiler);
           profiler.allocate(); // optional if used with out-of-scope dtor
-          matrixA = profiler.release();
         }
         profile_stat.stop();
 
@@ -364,14 +362,12 @@ AlienTestModule::test()
 
           } else if (m_vect_size == 1) {
             Alien::ProfiledMatrixBuilder builder(
-                std::move(matrixA), Alien::ProfiledMatrixOptions::eResetValues);
+                matrixA, Alien::ProfiledMatrixOptions::eResetValues);
             fillInMatrix(
                 cell_cell_connection, areaP, allPIndex, allUIndex, allXIndex, builder);
             builder
                 .finalize(); // process extra work after filling (squeeze, non-local...)
             // optional if used with out-of-scope dtor
-            matrixA = builder.release();
-
             {
               SimpleCSRLinearAlgebra alg;
               Alien::VectorData vectorR(space, m_vdist);
@@ -382,13 +378,12 @@ AlienTestModule::test()
               info() << "CSR RES : " << res;
             }
           } else if (m_vect_size > 1) {
-            Alien::ProfiledBlockMatrixBuilder builder(std::move(matrixA),
+            Alien::ProfiledBlockMatrixBuilder builder(matrixA,
                 Alien::ProfiledBlockMatrixBuilderOptions::eResetValues);
             profiledFillInMatrix(
                 cell_cell_connection, areaP, allPIndex, allUIndex, allXIndex, builder);
             builder
                 .finalize(); // process extra work after filling (squeeze, non-local...)
-            matrixA = builder.release();
           }
           inserter_stats.back().stop();
         }
@@ -512,7 +507,7 @@ void
 AlienTestModule::buildAndFillInBlockVector(Alien::VectorData& vectorB,
     ConstArrayView<Integer> allXIndex, ConstArrayView<Real> value)
 {
-  Alien::LocalBlockVectorWriter b(std::move(vectorB));
+  Alien::LocalBlockVectorWriter b(vectorB);
   ENUMERATE_CELL (icell, m_areaT.own()) {
     const Integer id = allXIndex[icell->localId()];
     b[id][0] = value[0];
@@ -523,7 +518,6 @@ AlienTestModule::buildAndFillInBlockVector(Alien::VectorData& vectorB,
     for (Integer i = 1; i < value.size(); ++i)
       b[id][i] = value[i];
   }
-  vectorB = b.release();
 }
 
 void
@@ -531,7 +525,7 @@ AlienTestModule::buildAndFillInBlockVector(Alien::VectorData& vectorB,
     ConstArrayView<Integer> allUIndex, ConstArray2View<Integer> allPIndex,
     ConstArrayView<Integer> allXIndex ALIEN_UNUSED_PARAM, ConstArrayView<Real> value)
 {
-  Alien::LocalBlockVectorWriter b(std::move(vectorB));
+  Alien::LocalBlockVectorWriter b(vectorB);
   ENUMERATE_CELL (icell, m_areaT.own()) {
     const Integer id = allUIndex[icell->localId()];
     b[id][0] = value[0];
@@ -549,18 +543,16 @@ AlienTestModule::buildAndFillInBlockVector(Alien::VectorData& vectorB,
     const Integer id1 = allPIndex[inode->localId()][1];
     b[id1][0] = value[0];
   }
-  vectorB = b.release();
 }
 
 void
 AlienTestModule::buildAndFillInVector(Alien::VectorData& vectorB, const double& value)
 {
   const Alien::VectorDistribution& dist = vectorB.distribution();
-  Alien::LocalVectorWriter v(std::move(vectorB));
+  Alien::LocalVectorWriter v(vectorB);
   info() << "Vector local size= " << v.size();
   for (Integer i = 0; i < dist.localSize(); ++i)
     v[i] = value;
-  vectorB = v.release();
 }
 
 void
@@ -569,13 +561,12 @@ AlienTestModule::buildAndFillInBlockVector(
 {
   const Alien::VectorDistribution& dist = vectorB.distribution();
   const Alien::Block* block = vectorB.block();
-  Alien::LocalBlockVectorWriter v(std::move(vectorB));
+  Alien::LocalBlockVectorWriter v(vectorB);
   for (Integer i = 0; i < dist.localSize(); ++i) {
     ArrayView<Real> values = v[i];
     for (Integer j = 0; j < block->size(); ++j)
       values[j] = value;
   }
-  vectorB = v.release();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -708,10 +699,9 @@ AlienTestModule::solve(Alien::ILinearSolver* solver, Alien::MatrixData& matrixA,
     AlienTestOptionTypes::eBuilderType builderType)
 {
   { // Réinitialisation de vectorX
-    Alien::LocalVectorWriter v(std::move(vectorX));
+    Alien::LocalVectorWriter v(vectorX);
     for (Integer i = 0; i < v.size(); ++i)
       v[i] = 0;
-    vectorX = v.release();
   }
 
   solver->solve(matrixA, vectorB, vectorX);
@@ -812,7 +802,6 @@ AlienTestModule::vectorVariableUpdate(Alien::VectorData& vectorB,
   //
   // VECTOR / VARIABLE
   //
-  // jmg Alien::ItemVectorAccessor v(std::move(vectorB));
   {
     Alien::ArcaneTools::ItemVectorAccessor v(vectorB);
     if (m_vect_size == 1) {
@@ -828,7 +817,6 @@ AlienTestModule::vectorVariableUpdate(Alien::VectorData& vectorB,
       v(indexSetU) = 0.;
       v(indexSetU) = Alien::ArcaneTools::Variable(m_w);
     }
-    // jmg vectorB = v.release();
   }
 }
 
