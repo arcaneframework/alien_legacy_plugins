@@ -42,9 +42,9 @@ if(NOT MCGSOLVER_FOUND)
     )
   mark_as_advanced(MCGSOLVER_CUDA_LIBRARY)
   
-  find_path(MCGSOLVER_INCLUDE_DIR MCGS.h
+  find_path(MCGSOLVER_INCLUDE_DIR ILinearSolver.h
     HINTS ${MCGSOLVER_ROOT} 
-		PATH_SUFFIXES include
+    PATH_SUFFIXES include/MCGSolver
     ${_MCGSOLVER_SEARCH_OPTS}
     )
   mark_as_advanced(MCGSOLVER_INCLUDE_DIR)
