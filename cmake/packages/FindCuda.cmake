@@ -53,14 +53,14 @@ if(NOT CUDA_FOUND)
     ${_CUDA_SEARCH_OPTS}
     )
   mark_as_advanced(CUDA_INCLUDE_DIR)
-  
+
   find_path(HELPER_CUDA_INCLUDE_DIR helper_cuda.h
-      HINTS ${CUDA_ROOT} 
-      PATH_SUFFIXES samples/common/inc
-      ${_CUDA_SEARCH_OPTS}
-      )
+    HINTS ${CUDA_ROOT}
+    PATH_SUFFIXES samples/common/inc
+    ${_CUDA_SEARCH_OPTS}
+    )
   mark_as_advanced(HELPER_CUDA_INCLUDE_DIR)
-  
+
 endif()
 
 # pour limiter le mode verbose
@@ -73,8 +73,12 @@ find_package_handle_standard_args(CUDA DEFAULT_MSG
   CUSPARSE_LIBRARY)
 
 if(CUDA_FOUND AND NOT TARGET cuda)
-  
-  set(CUDA_INCLUDE_DIRS ${CUDA_INCLUDE_DIR} ${HELPER_CUDA_INCLUDE_DIR})
+
+  if(HELPER_CUDA_INCLUDE_DIR)
+    set(CUDA_INCLUDE_DIRS ${CUDA_INCLUDE_DIR} ${HELPER_CUDA_INCLUDE_DIR})
+  else()
+    set(CUDA_INCLUDE_DIRS ${CUDA_INCLUDE_DIR})
+  endif ()
 
   set(CUDA_LIBRARIES ${CUBLAS_LIBRARY}
                      ${CUDART_LIBRARY}
