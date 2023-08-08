@@ -42,9 +42,9 @@ if(NOT MCGSOLVER_FOUND)
     )
   mark_as_advanced(MCGSOLVER_CUDA_LIBRARY)
   
-  find_path(MCGSOLVER_INCLUDE_DIR ILinearSolver.h
+  find_path(MCGSOLVER_INCLUDE_DIR MCGSolver/ILinearSolver.h
     HINTS ${MCGSOLVER_ROOT} 
-    PATH_SUFFIXES include/MCGSolver
+    PATH_SUFFIXES include
     ${_MCGSOLVER_SEARCH_OPTS}
     )
   mark_as_advanced(MCGSOLVER_INCLUDE_DIR)
@@ -100,5 +100,9 @@ if(MCGSOLVER_FOUND AND NOT TARGET mcgsolver)
 
   set_target_properties(mcgsolver PROPERTIES
     INTERFACE_COMPILE_DEFINITIONS "${MCGSOLVER_FLAGS}")
+
+  # for MCGSolver 2.X
+  set_property(TARGET mcgsolver APPEND PROPERTY
+    INTERFACE_LINK_LIBRARIES numa)
 
 endif()
