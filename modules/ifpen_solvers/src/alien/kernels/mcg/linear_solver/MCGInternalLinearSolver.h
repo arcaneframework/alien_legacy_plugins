@@ -166,7 +166,7 @@ class ALIEN_IFPEN_SOLVERS_EXPORT MCGInternalLinearSolver : public ILinearSolver,
   void _registerKey(const MCGMatrixType& A, const MCGVectorType& b,
       const MCGVectorType& x0, const MCGVectorType& x);
 
-  typedef MCGSolver::ILinearSystem<double, MCGSolver::LinearSystem<double>>
+  typedef MCGSolver::ILinearSystem<double, MCGSolver::LinearSystem<double,int,int>,int,int>
       MCGSolverLinearSystem;
 
   MCGSolverLinearSystem* _createSystem(const MCGMatrixType& A, const MCGVectorType& b,

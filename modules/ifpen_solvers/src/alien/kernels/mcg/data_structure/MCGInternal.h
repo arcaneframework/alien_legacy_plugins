@@ -64,7 +64,7 @@ class MatrixInternal
 {
  public:
   typedef MCGSolver::CSRProfile<int, int> ProfileType;
-  typedef MCGSolver::BCSRMatrix<double> MatrixType;
+  typedef MCGSolver::BCSRMatrix<double,double,int,int> MatrixType;
 
   bool m_elliptic_split_tag = false;
   MCGSolver::BVector<MCGSolver::Equation::eType>* m_equation_type = nullptr;
