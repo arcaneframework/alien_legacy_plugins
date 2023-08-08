@@ -54,13 +54,6 @@ if(NOT CUDA_FOUND)
     )
   mark_as_advanced(CUDA_INCLUDE_DIR)
   
-  find_path(HELPER_CUDA_INCLUDE_DIR helper_cuda.h
-      HINTS ${CUDA_ROOT} 
-      PATH_SUFFIXES samples/common/inc
-      ${_CUDA_SEARCH_OPTS}
-      )
-  mark_as_advanced(HELPER_CUDA_INCLUDE_DIR)
-  
 endif()
 
 # pour limiter le mode verbose
