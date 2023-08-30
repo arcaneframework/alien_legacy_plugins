@@ -59,7 +59,7 @@ MCGVector::setValues(double const* values)
   assert(dist.localSize() == m_internal->m_bvector.size());
 
   double* data = m_internal->m_bvector.data();
-  for (int i = 0; i < dist.localSize() * block_size; ++i)
+  for (Integer i = 0; i < dist.localSize() * block_size; ++i)
     data[i] = values[i];
 }
 
@@ -79,7 +79,7 @@ MCGVector::getValues(double* values) const
   assert(dist.localSize() == m_internal->m_bvector.size());
 
   const double* data = m_internal->m_bvector.data();
-  for (int i = 0; i < dist.localSize() * block_size; i++)
+  for (Integer i = 0; i < dist.localSize() * block_size; i++)
     values[i] = data[i];
 }
 

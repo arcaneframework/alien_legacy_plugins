@@ -63,8 +63,8 @@ class UniqueKey
 class MatrixInternal
 {
  public:
-  typedef MCGSolver::CSRProfile<int, int> ProfileType;
-  typedef MCGSolver::BCSRMatrix<double,double,int,int> MatrixType;
+  typedef MCGSolver::CSRProfile<Integer , Integer> ProfileType;
+  typedef MCGSolver::BCSRMatrix<double,double,Integer , Integer> MatrixType;
 
   bool m_elliptic_split_tag = false;
   MCGSolver::BVector<MCGSolver::Equation::eType>* m_equation_type = nullptr;
@@ -73,7 +73,7 @@ class MatrixInternal
   std::shared_ptr<MatrixType> m_matrix[2][2] = { { nullptr, nullptr },
     { nullptr, nullptr } };
 
-  std::vector<int> m_elem_perm;
+  std::vector<Integer> m_elem_perm;
 
   MatrixInternal() {}
 
@@ -83,7 +83,7 @@ class MatrixInternal
 class VectorInternal
 {
  public:
-  VectorInternal(int nrow, int block_size)
+  VectorInternal(Integer nrow, int block_size)
   : m_bvector(nrow, block_size)
   {}
 
