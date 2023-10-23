@@ -255,17 +255,20 @@ if(MUMPS_FOUND AND NOT TARGET mumps)
   set_property(TARGET mumps APPEND PROPERTY
                INTERFACE_LINK_LIBRARIES "ptesmumps")
 
-  add_library(scalapack UNKNOWN IMPORTED)
-  set_target_properties(scalapack PROPERTIES
-                        IMPORTED_LINK_INTERFACE_LANGUAGES "CXX"
-                        IMPORTED_LOCATION "${SCALAPACK_LIBRARY}")
-    
-  set_property(TARGET mumps APPEND PROPERTY
-               INTERFACE_LINK_LIBRARIES "scalapack")
-  #if(TARGET mkl)
-  #  set_property(TARGET mumps APPEND PROPERTY
-  #               INTERFACE_LINK_LIBRARIES "mkl")
-  #endif()
+  if(TARGET mkl)
+    set_property(TARGET mumps APPEND PROPERTY
+                 INTERFACE_LINK_LIBRARIES "mkl")
+  else()
+    add_library(scalapack UNKNOWN IMPORTED)
+    set_target_properties(scalapack PROPERTIES
+            IMPORTED_LINK_INTERFACE_LANGUAGES "CXX"
+            IMPORTED_LOCATION "${SCALAPACK_LIBRARY}")
+
+
+    set_property(TARGET mumps APPEND PROPERTY
+                 INTERFACE_LINK_LIBRARIES "scalapack")
+  endif()
+
                
   add_library(gfortran UNKNOWN IMPORTED)
   set_target_properties(gfortran PROPERTIES
