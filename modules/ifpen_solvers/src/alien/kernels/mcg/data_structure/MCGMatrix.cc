@@ -21,8 +21,8 @@ MCGMatrix::~MCGMatrix()
 }
 
 bool
-MCGMatrix::initMatrix(const int block_size, const int block_size2, const int nrow,
-    int const* row_offset, int const* cols, int partition_offset)
+MCGMatrix::initMatrix(const int block_size, const int block_size2, const Integer nrow,
+    Integer const* row_offset, Integer const* cols, Integer partition_offset)
 {
   Integer nblocks = row_offset[nrow];
   std::shared_ptr<MCGInternal::MatrixInternal::ProfileType> profile(
@@ -67,7 +67,7 @@ MCGMatrix::computeEllipticSplitTags(int equation_num) const
 
   m_internal->m_equation_type =
       new MCGSolver::BVector<MCGSolver::Equation::eType>(local_size * equation_num, 1);
-  for (int i = 0; i < local_size * equation_num; ++i)
+  for (Integer i = 0; i < local_size * equation_num; ++i)
     m_internal->m_equation_type->data()[i] =
         MCGSolver::Equation::NoType; // NoTyp == 0 , Elliptic==1 cf. PrecondEquation.h
 

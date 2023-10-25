@@ -76,23 +76,23 @@ if(MCGSOLVER_FOUND AND NOT TARGET mcgsolver)
   set_target_properties(mcgsolver_main PROPERTIES 
 	  INTERFACE_INCLUDE_DIRECTORIES "${MCGSOLVER_INCLUDE_DIRS}")
   
-	set_target_properties(mcgsolver_main PROPERTIES
+  set_target_properties(mcgsolver_main PROPERTIES
     IMPORTED_LINK_INTERFACE_LANGUAGES "CXX"
     IMPORTED_LOCATION "${MCGSOLVER_LIBRARY}")
   
   # mcgsolver cuda
   
-	add_library(mcgsolver_cuda UNKNOWN IMPORTED)
+  add_library(mcgsolver_cuda UNKNOWN IMPORTED)
 	
-	set_target_properties(mcgsolver_cuda PROPERTIES
+  set_target_properties(mcgsolver_cuda PROPERTIES
     IMPORTED_LINK_INTERFACE_LANGUAGES "CXX"
     IMPORTED_LOCATION "${MCGSOLVER_CUDA_LIBRARY}")
   
   # mcgsolver
   
-	add_library(mcgsolver INTERFACE IMPORTED)
+  add_library(mcgsolver INTERFACE IMPORTED)
 	
-	set_property(TARGET mcgsolver APPEND PROPERTY 
+  set_property(TARGET mcgsolver APPEND PROPERTY
     INTERFACE_LINK_LIBRARIES "mcgsolver_main")
 
   set_property(TARGET mcgsolver APPEND PROPERTY 
@@ -104,5 +104,10 @@ if(MCGSOLVER_FOUND AND NOT TARGET mcgsolver)
   # for MCGSolver 2.X
   set_property(TARGET mcgsolver APPEND PROPERTY
     INTERFACE_LINK_LIBRARIES numa)
+
+  if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9)
+    set_property(TARGET mcgsolver APPEND PROPERTY
+      INTERFACE_LINK_LIBRARIES stdc++fs)
+  endif()
 
 endif()

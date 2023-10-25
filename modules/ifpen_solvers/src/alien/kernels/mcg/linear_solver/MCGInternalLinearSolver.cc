@@ -508,7 +508,7 @@ MCGInternalLinearSolver::solve(IMatrix const& A, IVector const& b, IVector& x)
     MCGVector& sol = x.impl()->get<BackEnd::tag::mcgsolver>(true);
 
     if (m_use_mpi) {
-      ConstArrayView<int> offsets;
+      ConstArrayView<Integer> offsets;
       UniqueArray<Integer> blockOffsets;
       int block_size;
 
@@ -518,25 +518,25 @@ MCGInternalLinearSolver::solve(IMatrix const& A, IVector const& b, IVector& x)
 #ifdef ALIEN_USE_ARCANE
         offsets = blockOffsets.constView();
 #else
-        offsets = ConstArrayView<int>(blockOffsets);
+        offsets = ConstArrayView<Integer>(blockOffsets);
 #endif
         block_size = blockSize;
         m_part_info = new MCGSolver::PartitionInfo;
-        m_part_info->init((int*)offsets.data(), offsets.size(), block_size);
+        m_part_info->init((Integer*)offsets.data(), offsets.size(), block_size);
       } else {
         Integer loffset = matrix.distribution().rowOffset();
         Integer nproc = m_parallel_mng->commSize();
         UniqueArray<Integer> scalarOffsets;
         scalarOffsets.resize(nproc + 1);
 
-        mpAllGather(m_parallel_mng, ConstArrayView<int>(1, &loffset),
-            ArrayView<int>(nproc, dataPtr(scalarOffsets)));
+        mpAllGather(m_parallel_mng, ConstArrayView<Integer>(1, &loffset),
+            ArrayView<Integer>(nproc, dataPtr(scalarOffsets)));
 
         scalarOffsets[nproc] = matrix.distribution().globalRowSize();
 #ifdef ALIEN_USE_ARCANE
         offsets = scalarOffsets.constView();
 #else
-        offsets = ConstArrayView<int>(scalarOffsets);
+        offsets = ConstArrayView<Integer>(scalarOffsets);
 #endif
         block_size = 1;
         m_part_info = new MCGSolver::PartitionInfo;
